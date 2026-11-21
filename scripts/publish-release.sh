@@ -3,7 +3,7 @@ set -euo pipefail
 
 # publish-release.sh — Quantum IDE Release Distribution Publisher (Bash/WSL/Linux)
 
-REPO="moustafaelturbo30-cpu/quantum-ide-distribution"
+REPO="Quantum-IDE/quantum-ide-distribution"
 UPDATE_CLASS="manual-consent"
 VERSION=""
 RELEASE_NOTES=""
@@ -128,4 +128,4 @@ git push origin main
 
 echo "=== Release $VERSION published successfully! ==="
 echo "Download URL: $DOWNLOAD_URL"
-echo "Portal: https://moustafaelturbo30-cpu.github.io/quantum-ide-distribution/"
+echo "Portal: https://Quantum-IDE.github.io/quantum-ide-distribution/"
