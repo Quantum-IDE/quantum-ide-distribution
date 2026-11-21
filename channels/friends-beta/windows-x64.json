@@ -4,6 +4,7 @@
     "productName": "Quantum IDE",
     "platform": "windows",
     "architecture": "x64",
+    "installerType": "inno-user-setup",
     "channel": "friends-beta",
     "version": "v0.1.0-beta.1",
     "buildRevision": 2,
@@ -23,5 +24,5 @@
     },
     "minOSVersion": "Windows 10 Build 19041+ (64-bit)",
     "keyId": "quantum-update-v1-prod",
-    "signature": "WeyFyrwWwci1lfasOAoblbrosPABwF7TnNPrA7AXLV/RT0xzyiyXoKlzZVwrfkt9w+HuGTRlmog948YX+63NDQ=="
+    "signature": "vwkeINpxfKO8en7FjNxWpte2P4ycRANFTosk2isREtxGUgVcJMJ3ePDMa+SUCYa+9LRMWRznLOs/QpySFK0yAw=="
 }

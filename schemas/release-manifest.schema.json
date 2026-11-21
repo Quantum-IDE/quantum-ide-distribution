@@ -42,6 +42,11 @@
       "enum": ["friends-beta", "canary", "stable"],
       "description": "Distribution channel name"
     },
+    "installerType": {
+      "type": "string",
+      "enum": ["inno-user-setup", "inno-system-setup", "archive"],
+      "description": "Installer packaging format for Windows distribution"
+    },
     "version": {
       "type": ["string", "null"],
       "pattern": "^v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
