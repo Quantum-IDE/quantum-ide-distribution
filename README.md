@@ -2,7 +2,7 @@
 
 Official public repository for **Quantum IDE** downloads, release manifests, and distribution infrastructure.
 
-🌐 **Live Download Portal:** [https://Quantum-IDE.github.io/quantum-ide-distribution/](https://Quantum-IDE.github.io/quantum-ide-distribution/)
+🌐 **Live Download Portal:** [https://Quantum-IDE.github.io/quantum-ide-distribution-/](https://Quantum-IDE.github.io/quantum-ide-distribution-/)
 
 ---
 
