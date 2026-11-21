@@ -92,14 +92,22 @@
   function verifyReleaseData(m) {
     if (!m || typeof m !== 'object') return { valid: false, reason: 'Manifest is not an object' };
 
-    // Check availability flag
-    if (m.available !== true) {
+    // Strict availability check:
+    // available === false strictly means no release is available (State 1).
+    // available === true proceeds to release validation (State 2).
+    // Any other value (null, undefined, "false", number, etc.) is an invalid manifest (State 3).
+    if (m.available === false) {
       return { valid: false, isUnavailable: true };
     }
+    if (m.available !== true) {
+      return { valid: false, reason: 'Field "available" must be boolean true or false' };
+    }
 
-    // 1. Valid version string
-    if (typeof m.version !== 'string' || !/^v?[0-9]+\.[0-9]+\.[0-9]+/.test(m.version.trim())) {
-      return { valid: false, reason: 'Invalid or missing version format' };
+    // 1. Strict SemVer validation (supporting optional v prefix, prerelease/beta tags, and build metadata)
+    // End-of-string anchored: strictly rejects invalid suffix like '0.1.0junk'
+    const SEMVER_STRICT_REGEX = /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+    if (typeof m.version !== 'string' || !SEMVER_STRICT_REGEX.test(m.version.trim())) {
+      return { valid: false, reason: 'Invalid SemVer format for version tag' };
     }
 
     // 2. Non-empty fileName
