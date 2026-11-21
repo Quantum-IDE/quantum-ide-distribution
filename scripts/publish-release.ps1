@@ -91,14 +91,14 @@ $currentUser = $currentUser.Trim()
 if ($currentUser.ToLower() -ne $OFFICIAL_OWNER.ToLower()) {
     throw "SECURITY ALERT: Authenticated as '$currentUser', but official publishing requires '$OFFICIAL_OWNER'. Publishing aborted."
 }
-Write-Host "      ✓ Authenticated identity verified: $currentUser (OFFICIAL)" -ForegroundColor Green
+Write-Host "      [OK] Authenticated identity verified: $currentUser (OFFICIAL)" -ForegroundColor Green
 
 # Verify access to official repository
 $repoCheck = (gh api "repos/$OFFICIAL_REPO" --jq .full_name 2>&1)
 if ($LASTEXITCODE -ne 0 -or $repoCheck.Trim() -ne $OFFICIAL_REPO) {
     throw "SECURITY ALERT: Cannot access official repository '$OFFICIAL_REPO' with the current session."
 }
-Write-Host "      ✓ Verified access to target repository: $OFFICIAL_REPO" -ForegroundColor Green
+Write-Host "      [OK] Verified access to target repository: $OFFICIAL_REPO" -ForegroundColor Green
 
 # ---------------------------------------------------------------------------
 # 2. VERIFY LOCAL GIT REMOTE TARGET
@@ -121,7 +121,7 @@ try {
     if ($remoteUrl -notmatch $expectedRegex) {
         throw "SECURITY ALERT: Local repository remote.origin.url is '$remoteUrl', which does not match official repository '$OFFICIAL_REPO'. Publishing aborted."
     }
-    Write-Host "      ✓ Git remote verified: $remoteUrl" -ForegroundColor Green
+    Write-Host "      [OK] Git remote verified: $remoteUrl" -ForegroundColor Green
 } finally {
     Pop-Location
 }
@@ -154,22 +154,22 @@ if (-not $Version.StartsWith("v")) {
     $Version = "v$Version"
 }
 
-Write-Host "      ✓ Target Version: $Version" -ForegroundColor Green
-Write-Host "      ✓ Target File:    $($installerItem.Name) ($([Math]::Round($installerItem.Length / 1MB, 2)) MB)" -ForegroundColor Green
-Write-Host "      ✓ Update Class:   $UpdateClass" -ForegroundColor Green
+Write-Host "      [OK] Target Version: $Version" -ForegroundColor Green
+Write-Host "      [OK] Target File:    $($installerItem.Name) ($([Math]::Round($installerItem.Length / 1MB, 2)) MB)" -ForegroundColor Green
+Write-Host "      [OK] Update Class:   $UpdateClass" -ForegroundColor Green
 
 # Validate optional Delta / Blockmap files
 if ($BlockmapPath) {
     if (-not (Test-Path $BlockmapPath)) {
         throw "Specified Blockmap file not found: $BlockmapPath"
     }
-    Write-Host "      ✓ Blockmap asset verified: $(Split-Path -Leaf $BlockmapPath)" -ForegroundColor Green
+    Write-Host "      [OK] Blockmap asset verified: $(Split-Path -Leaf $BlockmapPath)" -ForegroundColor Green
 }
 if ($DeltaPath) {
     if (-not (Test-Path $DeltaPath)) {
         throw "Specified Delta file not found: $DeltaPath"
     }
-    Write-Host "      ✓ Delta asset verified: $(Split-Path -Leaf $DeltaPath)" -ForegroundColor Green
+    Write-Host "      [OK] Delta asset verified: $(Split-Path -Leaf $DeltaPath)" -ForegroundColor Green
 }
 
 # ---------------------------------------------------------------------------
@@ -186,8 +186,8 @@ try {
     $shaFile = Join-Path ([System.IO.Path]::GetTempPath()) "$($installerItem.Name).sha256"
     "$sha256  $($installerItem.Name)" | Out-File -FilePath $shaFile -Encoding utf8
 }
-Write-Host "      ✓ SHA-256: $sha256" -ForegroundColor Green
-Write-Host "      ✓ Checksum file prepared: $shaFile" -ForegroundColor Green
+Write-Host "      [OK] SHA-256: $sha256" -ForegroundColor Green
+Write-Host "      [OK] Checksum file prepared: $shaFile" -ForegroundColor Green
 
 # ---------------------------------------------------------------------------
 # 5. PREPARE RELEASE NOTES
@@ -218,7 +218,7 @@ if ($ReleaseNotes -and (Test-Path $ReleaseNotes)) {
 This release is distributed exclusively through the official Quantum distribution portal.
 "@
 }
-Write-Host "      ✓ Release notes compiled." -ForegroundColor Green
+Write-Host "      [OK] Release notes compiled." -ForegroundColor Green
 
 # ---------------------------------------------------------------------------
 # 6. CREATE GITHUB RELEASE (OR DRY-RUN SIMULATION)
@@ -231,24 +231,39 @@ if ($BlockmapPath) { $uploadAssets += $BlockmapPath }
 if ($DeltaPath) { $uploadAssets += $DeltaPath }
 
 if ($DryRun) {
-    Write-Host "      ✓ [DryRun] Simulated GitHub Release creation: $releaseTitle" -ForegroundColor Magenta
-    Write-Host "      ✓ [DryRun] Assets to upload: $($uploadAssets -join ', ')" -ForegroundColor Magenta
+    Write-Host "      [OK] [DryRun] Simulated GitHub Release creation: $releaseTitle" -ForegroundColor Magenta
+    Write-Host "      [OK] [DryRun] Assets to upload: $($uploadAssets -join ', ')" -ForegroundColor Magenta
 } else {
     # Check if release already exists
-    $existingRelease = gh release view $Version --repo $OFFICIAL_REPO 2>&1
-    if ($LASTEXITCODE -eq 0) {
+    $releaseExists = $false
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'SilentlyContinue'
+    try {
+        & gh release view $Version --repo $OFFICIAL_REPO 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $releaseExists = $true
+        }
+    } finally {
+        $ErrorActionPreference = $prevEAP
+    }
+
+    if ($releaseExists) {
         Write-Warning "Release $Version already exists on $OFFICIAL_REPO. Uploading assets to existing release..."
-        gh release upload $Version $uploadAssets --repo $OFFICIAL_REPO --clobber
+        & gh release upload $Version $uploadAssets --repo $OFFICIAL_REPO --clobber
         if ($LASTEXITCODE -ne 0) {
             throw "Failed to upload assets to existing GitHub release on $OFFICIAL_REPO."
         }
     } else {
-        gh release create $Version $uploadAssets `
+        $tempNotesPath = Join-Path ([System.IO.Path]::GetTempPath()) "quantum-release-notes-$Version.md"
+        $notesContent | Out-File -FilePath $tempNotesPath -Encoding utf8
+        & gh release create $Version $uploadAssets `
             --repo $OFFICIAL_REPO `
             --title $releaseTitle `
-            --notes $notesContent `
+            --notes-file $tempNotesPath `
             --prerelease
-        if ($LASTEXITCODE -ne 0) {
+        $createExit = $LASTEXITCODE
+        Remove-Item $tempNotesPath -Force -ErrorAction SilentlyContinue
+        if ($createExit -ne 0) {
             throw "Failed to create GitHub release on $OFFICIAL_REPO."
         }
     }
@@ -259,7 +274,7 @@ if ($DryRun) {
     if (-not ($uploadedNames -contains $installerItem.Name)) {
         throw "Asset upload verification failed: $($installerItem.Name) not found in release assets."
     }
-    Write-Host "      ✓ GitHub Release active and assets verified." -ForegroundColor Green
+    Write-Host "      [OK] GitHub Release active and assets verified." -ForegroundColor Green
 }
 
 # ---------------------------------------------------------------------------
@@ -322,16 +337,16 @@ try {
     if (-not $verifyPassed) {
         throw "JSON Schema validation failed for updated manifest:`n$verifyOutput"
     }
-    Write-Host "      ✓ Manifest verified against JSON Schema Draft-07 (Ajv 8)." -ForegroundColor Green
+    Write-Host "      [OK] Manifest verified against JSON Schema Draft-07 (Ajv 8)." -ForegroundColor Green
 
     if ($DryRun) {
         Copy-Item $manifestBackupPath $manifestPath -Force
         Remove-Item $manifestBackupPath -Force
         if (Test-Path $shaFile) { Remove-Item $shaFile -Force -ErrorAction SilentlyContinue }
-        Write-Host "      ✓ [DryRun] Manifest validation PASSED. Reverted local changes." -ForegroundColor Magenta
+        Write-Host "      [OK] [DryRun] Manifest validation PASSED. Reverted local changes." -ForegroundColor Magenta
     } else {
         Remove-Item $manifestBackupPath -Force
-        Write-Host "      ✓ Manifest written and verified." -ForegroundColor Green
+        Write-Host "      [OK] Manifest written and verified." -ForegroundColor Green
 
         # Strictly stage only the release manifest file (NO git add -A)
         Push-Location $RepoRoot
@@ -350,7 +365,7 @@ try {
             if ($LASTEXITCODE -ne 0) {
                 throw "Failed to push release manifest to origin main."
             }
-            Write-Host "      ✓ Manifest pushed to official repository. GitHub Pages will auto-deploy." -ForegroundColor Green
+            Write-Host "      [OK] Manifest pushed to official repository. GitHub Pages will auto-deploy." -ForegroundColor Green
         } finally {
             Pop-Location
         }

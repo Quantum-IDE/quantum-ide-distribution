@@ -25,8 +25,8 @@ import { readFileSync } from 'fs';
 // Must match QUANTUM_UPDATE_PUBLIC_KEY_TEST_HEX in quantumSignatureVerifier.ts
 const PUBLIC_KEYS = {
   'quantum-update-v1-test': '302a300506032b65700321009d0e9dbed91b47cd728c019c639c4146bd6d7104c7a876c86617af5a0723c16c',
-  // Placeholder — replace with real production key DER SPKI hex before production build
-  'quantum-update-v1-prod': 'PLACEHOLDER_REPLACE_BEFORE_PRODUCTION_BUILD',
+  // Official production public key DER SPKI hex
+  'quantum-update-v1-prod': '302a300506032b6570032100c429cbe8994ec71a0cf08652354b7f04b5d89ffdce050ce15a49a95595af8738',
 };
 
 function jcsStringify(value) {
