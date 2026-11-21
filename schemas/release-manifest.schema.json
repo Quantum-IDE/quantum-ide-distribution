@@ -2,11 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://quantum-ide.github.io/quantum-ide-distribution/schemas/release-manifest.schema.json",
   "title": "QuantumIDEReleaseManifest",
-  "description": "Defines the release manifest metadata for a specific Quantum IDE distribution channel and platform.",
+  "description": "Defines the release manifest metadata for a specific Quantum IDE distribution channel and platform. Schema v2.0.0 adds mandatory commit, buildRevision, and optional Ed25519 signature fields.",
   "type": "object",
   "required": [
     "schemaVersion",
-    "product",
+    "productName",
     "platform",
     "architecture",
     "channel",
@@ -20,12 +20,12 @@
     "schemaVersion": {
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-      "description": "Semantic version of the manifest schema format (e.g., 1.0.0)"
+      "description": "Semantic version of the manifest schema format (e.g., 2.0.0)"
     },
-    "product": {
+    "productName": {
       "type": "string",
       "enum": ["Quantum IDE"],
-      "description": "Product brand identifier"
+      "description": "Product brand identifier. Must equal 'Quantum IDE'. (Renamed from 'product' in schema v2.0.0 to match engine validation contract.)"
     },
     "platform": {
       "type": "string",
@@ -45,7 +45,17 @@
     "version": {
       "type": ["string", "null"],
       "pattern": "^v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
-      "description": "Release semver tag (e.g., v0.1.0-beta.1)"
+      "description": "Release semver tag (e.g., 0.1.0-beta.1 or v0.1.0-beta.1 — leading v is stripped by the engine)"
+    },
+    "buildRevision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonically increasing build number within a given version. Increments on every rebuild or CI run. Must be strictly greater than the previously deployed buildRevision for the same version."
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full 40-character lowercase Git commit SHA of the source tree used to produce the installer. Used as build identity in Win32 versioned resources folder (first 10 chars)."
     },
     "updateClass": {
       "type": "string",
@@ -68,7 +78,7 @@
     },
     "fileName": {
       "type": ["string", "null"],
-      "description": "Canonical filename of the installer asset (e.g., Quantum-Setup-0.1.0-beta.1-x64.exe)"
+      "description": "Canonical filename of the installer asset (e.g., Quantum-IDE-0.1.0-beta.1-win-x64-setup.exe)"
     },
     "sizeBytes": {
       "type": ["integer", "null"],
@@ -78,12 +88,21 @@
     "sha256": {
       "type": ["string", "null"],
       "pattern": "^[a-fA-F0-9]{64}$",
-      "description": "SHA-256 cryptographic digest of the installer file"
+      "description": "SHA-256 cryptographic digest of the installer file (hex, 64 chars)"
     },
     "releaseNotesUrl": {
       "type": ["string", "null"],
       "format": "uri",
       "description": "URL to public release notes or changelog"
+    },
+    "signature": {
+      "type": "string",
+      "description": "Base64-encoded Ed25519 signature over the RFC 8785 JCS canonical manifest (all fields except 'signature' itself, keys sorted recursively). Required for production distribution."
+    },
+    "keyId": {
+      "type": "string",
+      "enum": ["quantum-update-v1-test", "quantum-update-v1-prod"],
+      "description": "Identifier of the Ed25519 signing key used to produce the signature. 'quantum-update-v1-test' for development/test only; 'quantum-update-v1-prod' for production releases."
     },
     "deltaSupport": {
       "type": "object",
@@ -97,7 +116,7 @@
     },
     "minOSVersion": {
       "type": ["string", "null"],
-      "description": "Minimum supported operating system version"
+      "description": "Minimum supported operating system version (e.g., '10.0' for Windows 10)"
     }
   },
   "additionalProperties": false,
@@ -109,6 +128,8 @@
   "then": {
     "required": [
       "version",
+      "buildRevision",
+      "commit",
       "downloadUrl",
       "fileName",
       "sizeBytes",
@@ -119,6 +140,14 @@
       "version": {
         "type": "string",
         "pattern": "^v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+      },
+      "buildRevision": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "commit": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
       },
       "downloadUrl": {
         "type": "string",
