@@ -141,18 +141,37 @@ if (!fs.existsSync(logoPath)) {
   }
 }
 
-// 4. Validate GitHub Actions workflow
-const workflowPath = path.join(rootDir, '.github', 'workflows', 'pages.yml');
-if (!fs.existsSync(workflowPath)) {
+// 4. Validate GitHub Actions workflows
+const pagesWorkflow = path.join(rootDir, '.github', 'workflows', 'pages.yml');
+const validateWorkflow = path.join(rootDir, '.github', 'workflows', 'validate.yml');
+
+if (!fs.existsSync(pagesWorkflow)) {
   error('Missing .github/workflows/pages.yml');
 } else {
-  const workflow = fs.readFileSync(workflowPath, 'utf8');
+  const workflow = fs.readFileSync(pagesWorkflow, 'utf8');
   if (workflow.includes('actions/deploy-pages') && workflow.includes('permissions:')) {
     success('.github/workflows/pages.yml configured properly for Pages deployment');
   } else {
     error('.github/workflows/pages.yml missing critical deployment actions or permissions');
   }
 }
+
+if (!fs.existsSync(validateWorkflow)) {
+  error('Missing .github/workflows/validate.yml');
+} else {
+  success('.github/workflows/validate.yml verified');
+}
+
+// 5. Validate Documentation
+const docs = ['DISTRIBUTION.md', 'RELEASE-PROCESS.md', 'UPDATE-ARCHITECTURE.md'];
+docs.forEach(doc => {
+  const docPath = path.join(rootDir, 'docs', doc);
+  if (!fs.existsSync(docPath)) {
+    error(`Missing documentation: docs/${doc}`);
+  } else {
+    success(`Documentation verified: docs/${doc}`);
+  }
+});
 
 console.log('\n------------------------------------------------');
 if (hasErrors) {

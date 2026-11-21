@@ -70,65 +70,8 @@ Example: `channels/friends-beta/windows-x64.json`
 
 ---
 
-## 3. Dual Update Classification Strategy
+## 3. Related Documentation
 
-Quantum IDE does not determine update urgency from the version number alone. Instead, the `updateClass` explicitly dictates the client's presentation and installation behavior.
-
-### A. Silent Updates (`silent-next-launch`)
-* **Intended Use**: Hotfixes, minor bug patches, minor security mitigations, and performance adjustments that do not alter the user workflow.
-* **Client Behavior**:
-  1. Quantum IDE background daemon polls the channel manifest.
-  2. Detects a new version with `updateClass: "silent-next-launch"`.
-  3. Downloads and verifies payload silently in the background (or applies delta patch).
-  4. Stages payload in local staging directory.
-  5. Automatically swaps the binary upon next application start without interrupting active sessions or requiring manual clicks.
-
-### B. Manual Consent Updates (`manual-consent`)
-* **Intended Use**: Major feature releases, significant UI changes, new AI models/integrations, and architecture migrations.
-* **Client Behavior**:
-  1. Client detects manifest change.
-  2. Notifies user via a non-intrusive notification badge.
-  3. Shows release highlights, features, and migration warnings.
-  4. Waits for explicit user consent before proceeding.
-  5. Never forcibly restarts or updates without authorization.
-
----
-
-## 4. Delta / Differential Updates Strategy
-
-To minimize bandwidth consumption, the distribution infrastructure provides architectural hooks for differential patching:
-
-- **Blockmap Metadata**: For installers built via electron-builder or Squirrel, a corresponding `.blockmap` file is published alongside the installer.
-- **Differential Calculation**: Quantum client updater downloads only the changed chunks across versions.
-- **Graceful Fallback**: If blockmap verification fails or chunk range requests return HTTP errors, the client falls back to `downloadUrl` for a full, safe installer download.
-
----
-
-## 5. Publishing a New Release
-
-To publish a newly built installer, maintainers use the automated publishing tool:
-
-### Using PowerShell (Windows):
-```powershell
-.\scripts\publish-release.ps1 `
-    -InstallerPath "C:\Builds\Quantum-Setup-0.1.0-beta.1-x64.exe" `
-    -Version "v0.1.0-beta.1" `
-    -UpdateClass "manual-consent"
-```
-
-### Using Bash (Linux / WSL):
-```bash
-./scripts/publish-release.sh \
-    -f "/path/to/Quantum-Setup-0.1.0-beta.1-x64.exe" \
-    -v "v0.1.0-beta.1" \
-    -c "manual-consent"
-```
-
-The script automatically:
-1. Validates the binary file.
-2. Computes the SHA-256 checksum.
-3. Generates the `.sha256` checksum asset.
-4. Creates the GitHub Release with pre-release tagging.
-5. Uploads both assets to GitHub Releases.
-6. Updates `channels/friends-beta/windows-x64.json`.
-7. Commits and pushes the manifest to trigger GitHub Pages redeployment.
+- [Release Process Guide](./RELEASE-PROCESS.md): Step-by-step instructions for publishing releases with PowerShell and Bash.
+- [Update Architecture & Philosophy](./UPDATE-ARCHITECTURE.md): Comprehensive guide on Silent vs Manual updates, Delta updating, and code signing.
+- [JSON Schema Specification](../schemas/release-manifest.schema.json): Formal draft-07 JSON Schema for manifests.
