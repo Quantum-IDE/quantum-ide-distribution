@@ -2,17 +2,23 @@
 
 /**
  * verify-manifest.js
- * Comprehensive validation test suite for Quantum IDE distribution infrastructure.
+ * Official Quantum IDE Distribution Integrity & Real JSON Schema Validation.
+ * Powered by Ajv 8 (JSON Schema Draft-07).
  */
 
 const fs = require('fs');
 const path = require('path');
+const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
 
 const rootDir = path.resolve(__dirname, '..');
 let hasErrors = false;
 
-function error(msg) {
+function error(msg, details = null) {
   console.error('❌ ERROR: ' + msg);
+  if (details) {
+    console.error('   Details:', typeof details === 'string' ? details : JSON.stringify(details, null, 2));
+  }
   hasErrors = true;
 }
 
@@ -22,86 +28,96 @@ function success(msg) {
 
 console.log('=== Quantum IDE Distribution Integrity Verification ===\n');
 
-// 1. Validate Schema
+// 1. Initialize Ajv 8 Validator for JSON Schema Draft-07
+const ajv = new Ajv({
+  allErrors: true,
+  strict: false,
+  validateFormats: true
+});
+addFormats(ajv);
+
 const schemaPath = path.join(rootDir, 'schemas', 'release-manifest.schema.json');
+let validateManifest;
+
 if (!fs.existsSync(schemaPath)) {
-  error('Missing schema: ' + schemaPath);
+  error('Missing schema file at: ' + schemaPath);
 } else {
   try {
-    JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
-    success('Schema is valid JSON: schemas/release-manifest.schema.json');
+    const rawSchema = fs.readFileSync(schemaPath, 'utf8');
+    const schema = JSON.parse(rawSchema);
+
+    // Validate the schema itself with Ajv
+    const isSchemaValid = ajv.validateSchema(schema);
+    if (!isSchemaValid) {
+      error('Schema itself is not a valid JSON Schema Draft-07:', ajv.errorsText(ajv.errors));
+    } else {
+      validateManifest = ajv.compile(schema);
+      success('Schema loaded and compiled successfully with Ajv (JSON Schema Draft-07)');
+    }
   } catch (e) {
-    error('Invalid JSON in schema: ' + e.message);
+    error('Failed to parse or compile schema: ' + e.message);
   }
 }
 
-// 2. Validate Channels Manifests
-const channels = [
-  'channels/friends-beta/windows-x64.json',
-  'channels/friends-beta/linux-x64.json',
-  'channels/friends-beta/darwin-arm64.json'
-];
+// 2. Scan and Validate Channel Manifests against JSON Schema
+const channelsDir = path.join(rootDir, 'channels');
+const manifestFiles = [];
 
-const requiredKeys = [
-  'schemaVersion',
-  'product',
-  'platform',
-  'architecture',
-  'channel',
-  'available',
-  'updateClass'
-];
-
-const validUpdateClasses = ['silent-next-launch', 'manual-consent'];
-
-channels.forEach(relPath => {
-  const fullPath = path.join(rootDir, relPath);
-  if (!fs.existsSync(fullPath)) {
-    error('Missing channel manifest: ' + relPath);
-    return;
+function findManifests(dir) {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      findManifests(fullPath);
+    } else if (entry.isFile() && entry.name.endsWith('.json')) {
+      manifestFiles.push(fullPath);
+    }
   }
+}
 
+findManifests(channelsDir);
+
+if (manifestFiles.length === 0) {
+  error('No channel manifest files found in channels/ directory');
+}
+
+manifestFiles.forEach(fullPath => {
+  const relPath = path.relative(rootDir, fullPath).replace(/\\/g, '/');
   try {
-    const data = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
-    
-    // Check required keys
-    for (const key of requiredKeys) {
-      if (!(key in data)) {
-        error(`Manifest ${relPath} missing required key: ${key}`);
+    const content = fs.readFileSync(fullPath, 'utf8');
+    const manifest = JSON.parse(content);
+
+    if (!validateManifest) {
+      error(`Cannot validate ${relPath} because schema validator compilation failed.`);
+      return;
+    }
+
+    const isValid = validateManifest(manifest);
+    if (!isValid) {
+      const errorDetails = validateManifest.errors.map(err => ({
+        field: err.instancePath || '(root)',
+        keyword: err.keyword,
+        message: err.message,
+        params: err.params
+      }));
+      error(`Manifest validation failed against Draft-07 schema: ${relPath}`, errorDetails);
+    } else {
+      // Additional business logic check: downloadUrl host validation if available
+      if (manifest.available) {
+        if (!manifest.downloadUrl || !manifest.downloadUrl.startsWith('https://github.com/Quantum-IDE/quantum-ide-distribution/releases/download/')) {
+          error(`Manifest ${relPath} is available but downloadUrl does not point to official GitHub Releases for Quantum-IDE/quantum-ide-distribution: ${manifest.downloadUrl}`);
+          return;
+        }
       }
+      success(`Manifest valid (Ajv Draft-07): ${relPath} [available: ${manifest.available}, updateClass: ${manifest.updateClass}]`);
     }
-
-    if (data.product !== 'Quantum IDE') {
-      error(`Manifest ${relPath} has invalid product: ${data.product}`);
-    }
-
-    if (!validUpdateClasses.includes(data.updateClass)) {
-      error(`Manifest ${relPath} has invalid updateClass: ${data.updateClass}`);
-    }
-
-    if (typeof data.available !== 'boolean') {
-      error(`Manifest ${relPath} 'available' must be boolean`);
-    }
-
-    if (data.available) {
-      if (!data.downloadUrl || !data.downloadUrl.startsWith('https://github.com/')) {
-        error(`Manifest ${relPath} is available but has invalid downloadUrl: ${data.downloadUrl}`);
-      }
-      if (!data.sha256 || !/^[a-fA-F0-9]{64}$/.test(data.sha256)) {
-        error(`Manifest ${relPath} is available but has invalid sha256 checksum: ${data.sha256}`);
-      }
-      if (typeof data.sizeBytes !== 'number' || data.sizeBytes <= 0) {
-        error(`Manifest ${relPath} is available but has invalid sizeBytes: ${data.sizeBytes}`);
-      }
-    }
-
-    success(`Manifest valid: ${relPath} (available: ${data.available}, updateClass: ${data.updateClass})`);
   } catch (e) {
-    error(`Failed to parse ${relPath}: ${e.message}`);
+    error(`Failed to read/parse manifest JSON: ${relPath} - ${e.message}`);
   }
 });
 
-// 3. Validate Website index.html and assets
+// 3. Validate Website index.html and Assets
 const indexPath = path.join(rootDir, 'index.html');
 const logoPath = path.join(rootDir, 'quantum-logo.svg');
 
@@ -109,7 +125,7 @@ if (!fs.existsSync(indexPath)) {
   error('Missing index.html');
 } else {
   const html = fs.readFileSync(indexPath, 'utf8');
-  
+
   if (!html.includes('./quantum-logo.svg')) {
     error('index.html does not reference ./quantum-logo.svg');
   } else {
@@ -122,7 +138,7 @@ if (!fs.existsSync(indexPath)) {
     success('index.html dynamically queries Windows x64 Friends Beta manifest');
   }
 
-  // Ensure no hardcoded secret tokens
+  // Ensure no hardcoded tokens
   if (/ghp_[a-zA-Z0-9]{30,}|gho_[a-zA-Z0-9]{30,}|github_pat_[a-zA-Z0-9_]{30,}/.test(html)) {
     error('Potential secret token found inside index.html!');
   } else {
@@ -141,7 +157,7 @@ if (!fs.existsSync(logoPath)) {
   }
 }
 
-// 4. Validate GitHub Actions workflows
+// 4. Validate GitHub Actions Workflows
 const pagesWorkflow = path.join(rootDir, '.github', 'workflows', 'pages.yml');
 const validateWorkflow = path.join(rootDir, '.github', 'workflows', 'validate.yml');
 

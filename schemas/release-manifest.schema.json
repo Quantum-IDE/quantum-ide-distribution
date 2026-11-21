@@ -1,5 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://quantum-ide.github.io/quantum-ide-distribution/schemas/release-manifest.schema.json",
   "title": "QuantumIDEReleaseManifest",
   "description": "Defines the release manifest metadata for a specific Quantum IDE distribution channel and platform.",
   "type": "object",
@@ -13,8 +14,12 @@
     "updateClass"
   ],
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
     "schemaVersion": {
       "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
       "description": "Semantic version of the manifest schema format (e.g., 1.0.0)"
     },
     "product": {
@@ -44,7 +49,7 @@
     "updateClass": {
       "type": "string",
       "enum": ["silent-next-launch", "manual-consent"],
-      "description": "Classification governing how Quantum client consumes the update: silent-next-launch applies on next launch; manual-consent requires explicit user approval."
+      "description": "Classification governing how Quantum client consumes the update"
     },
     "publishedAt": {
       "type": ["string", "null"],
@@ -57,6 +62,7 @@
     },
     "downloadUrl": {
       "type": ["string", "null"],
+      "format": "uri",
       "description": "Direct HTTPS URL to download the binary installer asset on GitHub Releases"
     },
     "fileName": {
@@ -75,19 +81,65 @@
     },
     "releaseNotesUrl": {
       "type": ["string", "null"],
+      "format": "uri",
       "description": "URL to public release notes or changelog"
     },
     "deltaSupport": {
       "type": "object",
+      "required": ["enabled"],
       "properties": {
         "enabled": { "type": "boolean" },
-        "blockmapUrl": { "type": ["string", "null"] },
-        "fallbackUrl": { "type": ["string", "null"] }
-      }
+        "blockmapUrl": { "type": ["string", "null"], "format": "uri" },
+        "fallbackUrl": { "type": ["string", "null"], "format": "uri" }
+      },
+      "additionalProperties": false
     },
     "minOSVersion": {
       "type": ["string", "null"],
       "description": "Minimum supported operating system version"
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": {
+      "available": { "const": true }
+    }
+  },
+  "then": {
+    "required": [
+      "version",
+      "downloadUrl",
+      "fileName",
+      "sizeBytes",
+      "sha256",
+      "publishedAt"
+    ],
+    "properties": {
+      "version": {
+        "type": "string",
+        "pattern": "^v?[0-9]+\\.[0-9]+\\.[0-9]+"
+      },
+      "downloadUrl": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://"
+      },
+      "fileName": {
+        "type": "string",
+        "minLength": 1
+      },
+      "sizeBytes": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "sha256": {
+        "type": "string",
+        "pattern": "^[a-fA-F0-9]{64}$"
+      },
+      "publishedAt": {
+        "type": "string",
+        "format": "date-time"
+      }
     }
   }
 }

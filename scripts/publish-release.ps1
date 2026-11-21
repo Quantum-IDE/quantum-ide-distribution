@@ -1,10 +1,11 @@
-﻿<#
+<#
 .SYNOPSIS
     Official Quantum IDE Release Publisher for Distribution Infrastructure.
 .DESCRIPTION
-    Receives an externally built installer artifact, validates integrity, calculates SHA-256,
-    creates a GitHub Release in Quantum-IDE/quantum-ide-distribution, uploads assets,
-    and updates the dynamic release manifest channels/friends-beta/windows-x64.json.
+    Strictly locked to the official repository: Quantum-IDE/quantum-ide-distribution.
+    Receives an externally built installer artifact, validates integrity, verifies GitHub identity,
+    calculates SHA-256, creates a GitHub Release, uploads assets, updates and validates
+    channels/friends-beta/windows-x64.json, and pushes strictly to the official repository.
 .PARAMETER InstallerPath
     Absolute or relative path to the Windows installer (.exe, .msi, or .zip).
 .PARAMETER Version
@@ -17,10 +18,8 @@
     Optional path to the .blockmap differential update file.
 .PARAMETER DeltaPath
     Optional path to a differential delta package.
-.PARAMETER Repo
-    Target GitHub repository in 'owner/repo' format. Defaults to 'Quantum-IDE/quantum-ide-distribution'.
 .PARAMETER DryRun
-    Simulates release validation, hashing, and manifest verification without creating GitHub Releases or pushing git commits.
+    Simulates release validation, identity checks, hashing, and schema verification without modifying GitHub or git.
 .EXAMPLE
     .\scripts\publish-release.ps1 -InstallerPath "C:\Builds\Quantum-Setup-0.1.0-beta.1-x64.exe" -Version "v0.1.0-beta.1" -DryRun
 #>
@@ -47,41 +46,90 @@ param(
     [string]$DeltaPath = "",
 
     [Parameter(Mandatory = $false)]
-    [string]$Repo = "Quantum-IDE/quantum-ide-distribution",
-
-    [Parameter(Mandatory = $false)]
     [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
+
+# STRICT CONSTANTS — Locked to Official Repository & Identity
+$OFFICIAL_REPO = "Quantum-IDE/quantum-ide-distribution"
+$OFFICIAL_OWNER = "Quantum-IDE"
+
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
 
 Write-Host "`n========================================================" -ForegroundColor Cyan
-Write-Host "   Quantum IDE — Release Distribution Publisher" -ForegroundColor Cyan
+Write-Host "   Quantum IDE — Official Release Publisher" -ForegroundColor Cyan
+Write-Host "   Repository: $OFFICIAL_REPO (LOCKED)" -ForegroundColor Cyan
 if ($DryRun) {
-    Write-Host "   [DRY RUN MODE - No external changes will be made]" -ForegroundColor Magenta
+    Write-Host "   [DRY RUN MODE - Verification only, zero modifications]" -ForegroundColor Magenta
 }
 Write-Host "========================================================`n" -ForegroundColor Cyan
 
-# 1. Check GitHub CLI
-Write-Host "[1/7] Verifying GitHub CLI and authentication..." -ForegroundColor Yellow
+# ---------------------------------------------------------------------------
+# 1. VERIFY GITHUB CLI & AUTHENTICATED IDENTITY
+# ---------------------------------------------------------------------------
+Write-Host "[1/7] Verifying GitHub CLI and authenticated identity..." -ForegroundColor Yellow
+
 if (-not (Get-Command "gh" -ErrorAction SilentlyContinue)) {
-    throw "GitHub CLI ('gh') is not installed or not in PATH. Please install gh to publish releases."
+    throw "GitHub CLI ('gh') is not installed or not in PATH."
 }
 
-if (-not $DryRun) {
-    $authStatus = gh auth status 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        throw "GitHub CLI is not authenticated. Run 'gh auth login' first."
+# Verify gh session
+$null = gh auth status 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "GitHub CLI is not authenticated. Run 'gh auth login' to authenticate with the official $OFFICIAL_OWNER account."
+}
+
+# Query authenticated user login
+$currentUser = (gh api user --jq .login 2>&1)
+if ($LASTEXITCODE -ne 0 -or -not $currentUser) {
+    throw "Failed to query authenticated GitHub user identity."
+}
+$currentUser = $currentUser.Trim()
+
+if ($currentUser.ToLower() -ne $OFFICIAL_OWNER.ToLower()) {
+    throw "SECURITY ALERT: Authenticated as '$currentUser', but official publishing requires '$OFFICIAL_OWNER'. Publishing aborted."
+}
+Write-Host "      ✓ Authenticated identity verified: $currentUser (OFFICIAL)" -ForegroundColor Green
+
+# Verify access to official repository
+$repoCheck = (gh api "repos/$OFFICIAL_REPO" --jq .full_name 2>&1)
+if ($LASTEXITCODE -ne 0 -or $repoCheck.Trim() -ne $OFFICIAL_REPO) {
+    throw "SECURITY ALERT: Cannot access official repository '$OFFICIAL_REPO' with the current session."
+}
+Write-Host "      ✓ Verified access to target repository: $OFFICIAL_REPO" -ForegroundColor Green
+
+# ---------------------------------------------------------------------------
+# 2. VERIFY LOCAL GIT REMOTE TARGET
+# ---------------------------------------------------------------------------
+Write-Host "[2/7] Verifying Git remote target..." -ForegroundColor Yellow
+if (-not (Get-Command "git" -ErrorAction SilentlyContinue)) {
+    throw "Git is not installed or not in PATH."
+}
+
+Push-Location $RepoRoot
+try {
+    $remoteUrl = (git config --get remote.origin.url 2>&1)
+    if ($LASTEXITCODE -ne 0 -or -not $remoteUrl) {
+        throw "Could not determine git remote.origin.url in $RepoRoot"
     }
-    Write-Host "      ✓ GitHub CLI is authenticated." -ForegroundColor Green
-} else {
-    Write-Host "      ✓ [DryRun] GitHub CLI checked." -ForegroundColor Green
+    $remoteUrl = $remoteUrl.Trim()
+
+    # Remote URL must point strictly to Quantum-IDE/quantum-ide-distribution
+    $expectedRegex = '^(https:\/\/github\.com\/|git@github\.com:)Quantum-IDE\/quantum-ide-distribution(\.git)?$'
+    if ($remoteUrl -notmatch $expectedRegex) {
+        throw "SECURITY ALERT: Local repository remote.origin.url is '$remoteUrl', which does not match official repository '$OFFICIAL_REPO'. Publishing aborted."
+    }
+    Write-Host "      ✓ Git remote verified: $remoteUrl" -ForegroundColor Green
+} finally {
+    Pop-Location
 }
 
-# 2. Validate Installer File
-Write-Host "[2/7] Validating installer file..." -ForegroundColor Yellow
+# ---------------------------------------------------------------------------
+# 3. VALIDATE INSTALLER & INPUT ARTIFACTS
+# ---------------------------------------------------------------------------
+Write-Host "[3/7] Validating installer artifact..." -ForegroundColor Yellow
 if (-not (Test-Path $InstallerPath)) {
     throw "Installer file not found at path: $InstallerPath"
 }
@@ -124,10 +172,13 @@ if ($DeltaPath) {
     Write-Host "      ✓ Delta asset verified: $(Split-Path -Leaf $DeltaPath)" -ForegroundColor Green
 }
 
-# 3. Calculate Cryptographic Digest
-Write-Host "[3/7] Calculating SHA-256 cryptographic digest..." -ForegroundColor Yellow
+# ---------------------------------------------------------------------------
+# 4. CALCULATE CRYPTOGRAPHIC DIGEST (SHA-256)
+# ---------------------------------------------------------------------------
+Write-Host "[4/7] Calculating SHA-256 cryptographic digest..." -ForegroundColor Yellow
 $hashResult = Get-FileHash -Path $InstallerPath -Algorithm SHA256
 $sha256 = $hashResult.Hash.ToLower()
+
 $shaFile = "$InstallerPath.sha256"
 try {
     "$sha256  $($installerItem.Name)" | Out-File -FilePath $shaFile -Encoding utf8 -ErrorAction Stop
@@ -138,8 +189,10 @@ try {
 Write-Host "      ✓ SHA-256: $sha256" -ForegroundColor Green
 Write-Host "      ✓ Checksum file prepared: $shaFile" -ForegroundColor Green
 
-# 4. Prepare Release Notes
-Write-Host "[4/7] Preparing release notes..." -ForegroundColor Yellow
+# ---------------------------------------------------------------------------
+# 5. PREPARE RELEASE NOTES
+# ---------------------------------------------------------------------------
+Write-Host "[5/7] Preparing release notes..." -ForegroundColor Yellow
 $notesContent = ""
 if ($ReleaseNotes -and (Test-Path $ReleaseNotes)) {
     $notesContent = Get-Content -Path $ReleaseNotes -Raw
@@ -167,8 +220,10 @@ This release is distributed exclusively through the official Quantum distributio
 }
 Write-Host "      ✓ Release notes compiled." -ForegroundColor Green
 
-# 5. Create GitHub Release
-Write-Host "[5/7] Creating GitHub Release on $Repo..." -ForegroundColor Yellow
+# ---------------------------------------------------------------------------
+# 6. CREATE GITHUB RELEASE (OR DRY-RUN SIMULATION)
+# ---------------------------------------------------------------------------
+Write-Host "[6/7] Managing GitHub Release on $OFFICIAL_REPO..." -ForegroundColor Yellow
 $releaseTitle = "Quantum IDE $Version (Friends Beta)"
 
 $uploadAssets = @($InstallerPath, $shaFile)
@@ -180,24 +235,26 @@ if ($DryRun) {
     Write-Host "      ✓ [DryRun] Assets to upload: $($uploadAssets -join ', ')" -ForegroundColor Magenta
 } else {
     # Check if release already exists
-    $existingRelease = gh release view $Version --repo $Repo 2>&1
+    $existingRelease = gh release view $Version --repo $OFFICIAL_REPO 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Warning "Release $Version already exists on $Repo. Uploading assets to existing release..."
-        gh release upload $Version $uploadAssets --repo $Repo --clobber
+        Write-Warning "Release $Version already exists on $OFFICIAL_REPO. Uploading assets to existing release..."
+        gh release upload $Version $uploadAssets --repo $OFFICIAL_REPO --clobber
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to upload assets to existing GitHub release on $OFFICIAL_REPO."
+        }
     } else {
         gh release create $Version $uploadAssets `
-            --repo $Repo `
+            --repo $OFFICIAL_REPO `
             --title $releaseTitle `
             --notes $notesContent `
             --prerelease
-    }
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "Failed to create or upload assets to GitHub release on $Repo."
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to create GitHub release on $OFFICIAL_REPO."
+        }
     }
 
     # Verify assets on release
-    $releaseCheck = gh release view $Version --repo $Repo --json assets | ConvertFrom-Json
+    $releaseCheck = gh release view $Version --repo $OFFICIAL_REPO --json assets | ConvertFrom-Json
     $uploadedNames = $releaseCheck.assets | ForEach-Object { $_.name }
     if (-not ($uploadedNames -contains $installerItem.Name)) {
         throw "Asset upload verification failed: $($installerItem.Name) not found in release assets."
@@ -205,14 +262,16 @@ if ($DryRun) {
     Write-Host "      ✓ GitHub Release active and assets verified." -ForegroundColor Green
 }
 
-# 6. Update Release Manifest & Validate
-Write-Host "[6/7] Updating and verifying release manifest..." -ForegroundColor Yellow
+# ---------------------------------------------------------------------------
+# 7. UPDATE MANIFEST, VALIDATE SCHEMA, COMMIT & PUSH
+# ---------------------------------------------------------------------------
+Write-Host "[7/7] Updating release manifest & executing schema verification..." -ForegroundColor Yellow
 $manifestPath = Join-Path $RepoRoot "channels\friends-beta\windows-x64.json"
 $manifestBackupPath = "$manifestPath.bak"
 Copy-Item $manifestPath $manifestBackupPath
 
-$downloadUrl = "https://github.com/$Repo/releases/download/$Version/$($installerItem.Name)"
-$releaseNotesUrl = "https://github.com/$Repo/releases/tag/$Version"
+$downloadUrl = "https://github.com/$OFFICIAL_REPO/releases/download/$Version/$($installerItem.Name)"
+$releaseNotesUrl = "https://github.com/$OFFICIAL_REPO/releases/tag/$Version"
 
 try {
     $manifest = Get-Content -Path $manifestPath -Raw | ConvertFrom-Json
@@ -229,7 +288,7 @@ try {
     if ($BlockmapPath) {
         $blockmapName = Split-Path -Leaf $BlockmapPath
         $manifest.deltaSupport.enabled = $true
-        $manifest.deltaSupport.blockmapUrl = "https://github.com/$Repo/releases/download/$Version/$blockmapName"
+        $manifest.deltaSupport.blockmapUrl = "https://github.com/$OFFICIAL_REPO/releases/download/$Version/$blockmapName"
         $manifest.deltaSupport.fallbackUrl = $downloadUrl
     }
 
@@ -237,11 +296,10 @@ try {
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($manifestPath, $manifestJson + "`n", $utf8NoBom)
 
-    # Validate updated manifest with verify-manifest.js
+    # Validate updated manifest with verify-manifest.js (Ajv 8 Draft-07)
     $verifyPassed = $false
     $verifyOutput = ""
 
-    # If repository is on a WSL share, run via WSL node
     if ($RepoRoot -match '^\\\\wsl(\.localhost)?\\([^\\]+)(.*)$') {
         $distro = $Matches[2]
         $linuxPath = $Matches[3] -replace '\\', '/'
@@ -251,7 +309,6 @@ try {
         }
     }
 
-    # Otherwise execute with native node
     if (-not $verifyPassed -and (Get-Command "node" -ErrorAction SilentlyContinue)) {
         Push-Location $RepoRoot
         try {
@@ -263,43 +320,47 @@ try {
     }
 
     if (-not $verifyPassed) {
-        throw "Integrity verification failed for updated manifest:`n$verifyOutput"
+        throw "JSON Schema validation failed for updated manifest:`n$verifyOutput"
     }
-    Write-Host "      ✓ Manifest schema integrity verified with verify-manifest.js." -ForegroundColor Green
+    Write-Host "      ✓ Manifest verified against JSON Schema Draft-07 (Ajv 8)." -ForegroundColor Green
 
     if ($DryRun) {
-        # Restore backup in dry run mode
         Copy-Item $manifestBackupPath $manifestPath -Force
         Remove-Item $manifestBackupPath -Force
         if (Test-Path $shaFile) { Remove-Item $shaFile -Force -ErrorAction SilentlyContinue }
-        Write-Host "      ✓ [DryRun] Manifest validation succeeded. Reverted local file changes." -ForegroundColor Magenta
+        Write-Host "      ✓ [DryRun] Manifest validation PASSED. Reverted local changes." -ForegroundColor Magenta
     } else {
         Remove-Item $manifestBackupPath -Force
-        Write-Host "      ✓ Manifest written and ready for deployment." -ForegroundColor Green
+        Write-Host "      ✓ Manifest written and verified." -ForegroundColor Green
+
+        # Strictly stage only the release manifest file (NO git add -A)
+        Push-Location $RepoRoot
+        try {
+            git add "channels/friends-beta/windows-x64.json"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to stage release manifest in git."
+            }
+
+            git commit -m "release(friends-beta): publish Quantum IDE $Version for windows-x64"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to commit release manifest."
+            }
+
+            git push origin main
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to push release manifest to origin main."
+            }
+            Write-Host "      ✓ Manifest pushed to official repository. GitHub Pages will auto-deploy." -ForegroundColor Green
+        } finally {
+            Pop-Location
+        }
     }
 } catch {
-    # Revert manifest on any failure
     if (Test-Path $manifestBackupPath) {
         Copy-Item $manifestBackupPath $manifestPath -Force
         Remove-Item $manifestBackupPath -Force
     }
     throw $_
-}
-
-# 7. Commit & Push Manifest Update
-Write-Host "[7/7] Committing and pushing manifest update..." -ForegroundColor Yellow
-if ($DryRun) {
-    Write-Host "      ✓ [DryRun] Simulated git commit and push." -ForegroundColor Magenta
-} else {
-    Push-Location $RepoRoot
-    try {
-        git add "channels/friends-beta/windows-x64.json"
-        git commit -m "release(friends-beta): publish Quantum IDE $Version for windows-x64"
-        git push origin main
-        Write-Host "      ✓ Pushed to repository. GitHub Pages will auto-deploy the update." -ForegroundColor Green
-    } finally {
-        Pop-Location
-    }
 }
 
 Write-Host "`n========================================================" -ForegroundColor Green
@@ -309,7 +370,8 @@ if ($DryRun) {
     Write-Host "   Quantum IDE Release $Version Published Successfully!  " -ForegroundColor Green
 }
 Write-Host "========================================================" -ForegroundColor Green
+Write-Host "• Official Repo       : $OFFICIAL_REPO" -ForegroundColor Cyan
 Write-Host "• Direct Download URL : $downloadUrl" -ForegroundColor Cyan
 Write-Host "• SHA-256 Checksum    : $sha256" -ForegroundColor Cyan
 Write-Host "• Release Notes       : $releaseNotesUrl" -ForegroundColor Cyan
-Write-Host "• Distribution Portal : https://Quantum-IDE.github.io/quantum-ide-distribution/`n" -ForegroundColor Cyan
+Write-Host "• Distribution Portal : https://quantum-ide.github.io/quantum-ide-distribution/`n" -ForegroundColor Cyan

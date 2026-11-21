@@ -14,6 +14,7 @@
 .copy-btn{border:0;background:#152420;color:#91e6d1;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;font-family:ui-monospace,monospace}
 .copy-btn:hover{background:#1f3630}
 .notes-link{color:#91e6d1;text-decoration:underline;text-underline-offset:3px}
+.manifest-invalid{display:none;margin-top:10px;color:#fbbf24;font-size:12px;background:rgba(251,191,36,0.08);padding:6px 12px;border-radius:8px;border:1px solid rgba(251,191,36,0.25)}
 .manifest-error{display:none;margin-top:10px;color:#f87171;font-size:12px;background:rgba(239,68,68,0.08);padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.25)}
 </style><title>Quantum IDE · Friends Beta</title></head>
 <body><canvas id="c" aria-hidden="true"></canvas><div id="ui"><header><span class="brand" dir="ltr"><img src="./quantum-logo.svg" style="filter: drop-shadow(0 0 10px rgba(0,240,255,0.45));" alt="" width="28" height="28">Quantum <em>IDE</em></span><button id="lang"><span aria-hidden="true">EN / </span><span data-ar="English">العربية</span></button></header>
@@ -27,6 +28,7 @@
     <span id="btn-text" data-ar="تنزيل مثبت البرنامج">Download installer</span>
   </button>
   <small id="availability" data-ar="رابط ملف التثبيت غير متاح حاليًا.">Installer link not yet available.</small>
+  <div id="manifest-invalid" class="manifest-invalid" data-ar="بيانات الإصدار غير صالحة أو غير مكتملة.">Release metadata is incomplete or invalid.</div>
   <div id="manifest-error" class="manifest-error" data-ar="تعذر الاتصال بمركز التوزيع لجلب بيانات الإصدار.">Could not fetch release metadata from distribution center.</div>
   <div id="release-meta" class="release-meta">
     <div class="release-meta-row">
@@ -58,8 +60,9 @@
   const btn = document.getElementById('installer-btn');
   const btnText = document.getElementById('btn-text');
   const avail = document.getElementById('availability');
-  const metaBox = document.getElementById('release-meta');
+  const invalidBox = document.getElementById('manifest-invalid');
   const errorBox = document.getElementById('manifest-error');
+  const metaBox = document.getElementById('release-meta');
   const platformNotice = document.getElementById('platform-notice');
   const langBtn = document.getElementById('lang');
 
@@ -85,15 +88,81 @@
     } catch { return isoStr; }
   }
 
+  // 10-point comprehensive release verification before enabling download button
+  function verifyReleaseData(m) {
+    if (!m || typeof m !== 'object') return { valid: false, reason: 'Manifest is not an object' };
+
+    // Check availability flag
+    if (m.available !== true) {
+      return { valid: false, isUnavailable: true };
+    }
+
+    // 1. Valid version string
+    if (typeof m.version !== 'string' || !/^v?[0-9]+\.[0-9]+\.[0-9]+/.test(m.version.trim())) {
+      return { valid: false, reason: 'Invalid or missing version format' };
+    }
+
+    // 2. Non-empty fileName
+    if (typeof m.fileName !== 'string' || m.fileName.trim().length === 0) {
+      return { valid: false, reason: 'Missing or empty fileName' };
+    }
+
+    // 3 & 4. Valid HTTPS download URL strictly belonging to official GitHub Releases for Quantum-IDE/quantum-ide-distribution
+    const OFFICIAL_RELEASE_PREFIX = 'https://github.com/Quantum-IDE/quantum-ide-distribution/releases/download/';
+    if (typeof m.downloadUrl !== 'string' || !m.downloadUrl.startsWith(OFFICIAL_RELEASE_PREFIX)) {
+      return { valid: false, reason: 'downloadUrl does not point to official repository releases' };
+    }
+
+    // Direct release asset regex: prevents source code archives, external redirects, or web pages
+    const assetRegex = /^https:\/\/github\.com\/Quantum-IDE\/quantum-ide-distribution\/releases\/download\/[^\/]+\/[^\/]+$/;
+    if (!assetRegex.test(m.downloadUrl) || m.downloadUrl.includes('/archive/') || m.downloadUrl.endsWith('.zip?tag=')) {
+      return { valid: false, reason: 'downloadUrl is not a direct official release asset' };
+    }
+
+    // 5. Positive integer sizeBytes
+    if (typeof m.sizeBytes !== 'number' || !Number.isInteger(m.sizeBytes) || m.sizeBytes <= 0) {
+      return { valid: false, reason: 'sizeBytes must be a positive integer' };
+    }
+
+    // 6. SHA-256 exact 64-char hexadecimal digest
+    if (typeof m.sha256 !== 'string' || !/^[a-fA-F0-9]{64}$/.test(m.sha256)) {
+      return { valid: false, reason: 'sha256 must be a 64-character hexadecimal digest' };
+    }
+
+    // 7. Supported updateClass
+    const supportedClasses = ['silent-next-launch', 'manual-consent'];
+    if (!supportedClasses.includes(m.updateClass)) {
+      return { valid: false, reason: 'updateClass is not supported' };
+    }
+
+    // 8. Core schema attributes
+    if (m.product !== 'Quantum IDE' || m.platform !== 'windows' || m.architecture !== 'x64' || m.channel !== 'friends-beta') {
+      return { valid: false, reason: 'Channel or target metadata mismatch' };
+    }
+
+    // 9. Published date validity
+    if (typeof m.publishedAt !== 'string' || isNaN(Date.parse(m.publishedAt))) {
+      return { valid: false, reason: 'Invalid or missing publication timestamp' };
+    }
+
+    // 10. Check deltaSupport structure if present
+    if (m.deltaSupport && typeof m.deltaSupport !== 'object') {
+      return { valid: false, reason: 'deltaSupport must be an object' };
+    }
+
+    return { valid: true };
+  }
+
   fetch(MANIFEST_URL)
     .then(r => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
     .then(manifest => {
-      const isAvailable = Boolean(manifest && manifest.available && manifest.downloadUrl);
-      if (isAvailable) {
-        // Enable installer button as a direct link or download action
+      const check = verifyReleaseData(manifest);
+
+      if (check.valid) {
+        // State 2: Valid release available & verified
         const link = document.createElement('a');
         link.id = 'installer-btn';
         link.className = 'installer';
@@ -101,7 +170,6 @@
         link.setAttribute('download', manifest.fileName || '');
         link.setAttribute('rel', 'noopener');
         
-        // Retain child SVG & localized text
         const svg = btn.querySelector('svg');
         if (svg) link.appendChild(svg.cloneNode(true));
         const textSpan = document.createElement('span');
@@ -112,6 +180,8 @@
 
         btn.replaceWith(link);
         avail.style.display = 'none';
+        invalidBox.style.display = 'none';
+        errorBox.style.display = 'none';
 
         // Populate metadata box
         document.getElementById('meta-version').textContent = manifest.version || 'Friends Beta';
@@ -140,18 +210,32 @@
             });
           });
         }
-      } else {
-        // Explicitly unavailable
+      } else if (check.isUnavailable) {
+        // State 1: Explicitly unavailable (available === false)
         btn.disabled = true;
         avail.style.display = 'block';
+        invalidBox.style.display = 'none';
+        errorBox.style.display = 'none';
         metaBox.style.display = 'none';
+      } else {
+        // State 3: Corrupted or invalid release data
+        btn.disabled = true;
+        avail.style.display = 'none';
+        invalidBox.style.display = 'block';
+        errorBox.style.display = 'none';
+        metaBox.style.display = 'none';
+        console.warn('Distribution manifest failed integrity verification:', check.reason);
       }
       refreshLocalizedNodes();
     })
     .catch(err => {
+      // State 4: Distribution center connection / network failure
       console.warn('Distribution manifest could not be loaded:', err);
+      btn.disabled = true;
       avail.style.display = 'none';
+      invalidBox.style.display = 'none';
       errorBox.style.display = 'block';
+      metaBox.style.display = 'none';
       refreshLocalizedNodes();
     });
 

@@ -8,6 +8,9 @@ on:
       - 'index.html'
       - 'quantum-logo.svg'
       - 'channels/**'
+      - 'schemas/**'
+      - 'scripts/**'
+      - 'package*.json'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -22,6 +25,7 @@ concurrency:
 
 jobs:
   validate:
+    name: Integrity & Schema Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,12 +35,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
-      - name: Validate Release Manifests and Assets
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Release Manifests and Assets (Ajv 8)
         run: |
           node scripts/verify-manifest.js
 
+      - name: Run Schema Test Suite
+        run: |
+          node scripts/test-manifest-validation.js
+
   deploy:
+    name: Deploy to GitHub Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

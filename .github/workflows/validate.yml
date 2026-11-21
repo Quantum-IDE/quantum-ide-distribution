@@ -28,7 +28,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
-      - name: Verify Schema, Manifests, and Assets
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Real JSON Schema Validation (Ajv 8 Draft-07)
         run: |
           node scripts/verify-manifest.js
+
+      - name: Run Positive & Negative Schema Test Suite (10 Cases)
+        run: |
+          node scripts/test-manifest-validation.js

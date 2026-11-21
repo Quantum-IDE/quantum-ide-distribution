@@ -1,0 +1,14 @@
+{
+  "name": "quantum-ide-distribution",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Official public distribution repository and release infrastructure for Quantum IDE",
+  "scripts": {
+    "verify": "node scripts/verify-manifest.js",
+    "test": "node scripts/test-manifest-validation.js"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}
