@@ -3,7 +3,7 @@
     Official Quantum IDE Release Publisher for Distribution Infrastructure.
 .DESCRIPTION
     Receives an externally built installer artifact, validates integrity, calculates SHA-256,
-    creates a GitHub Release in Quantum-IDE/quantum-ide-distribution, uploads assets,
+    creates a GitHub Release in Quantum-IDE/quantum-ide-distribution-, uploads assets,
     and updates the dynamic release manifest channels/friends-beta/windows-x64.json.
 .PARAMETER InstallerPath
     Absolute or relative path to the Windows installer (.exe, .msi, or .zip).
@@ -33,7 +33,7 @@ param(
     [string]$ReleaseNotes = "",
 
     [Parameter(Mandatory = $false)]
-    [string]$Repo = "Quantum-IDE/quantum-ide-distribution"
+    [string]$Repo = "Quantum-IDE/quantum-ide-distribution-"
 )
 
 $ErrorActionPreference = "Stop"

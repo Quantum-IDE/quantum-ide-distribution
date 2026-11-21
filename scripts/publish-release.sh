@@ -3,7 +3,7 @@ set -euo pipefail
 
 # publish-release.sh — Quantum IDE Release Distribution Publisher (Bash/WSL/Linux)
 
-REPO="Quantum-IDE/quantum-ide-distribution"
+REPO="Quantum-IDE/quantum-ide-distribution-"
 UPDATE_CLASS="manual-consent"
 VERSION=""
 RELEASE_NOTES=""
