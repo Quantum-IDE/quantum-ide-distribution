@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a0c0e"><meta name="description" content="Download information for the Quantum IDE Friends Beta, a desktop development environment built on VS Code with its own AI agent."><meta property="og:title" content="Download Quantum IDE"><meta property="og:type" content="website"><link rel="icon" type="image/svg+xml" href="./quantum-logo.svg"><style>:root{color-scheme:dark;background:#0a0c0e;color:#eef3ef;font:16px/1.55 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;isolation:isolate}#c{position:fixed;inset:0;z-index:-1;width:100%;height:100%;display:block}#ui{pointer-events:none;min-height:100svh;background:linear-gradient(to bottom,transparent 51%,#0a0c0e28 78%,#0a0c0e66)}.assembling #ui{visibility:hidden;opacity:0}.assembled #ui{animation:appear .85s ease-out both}@keyframes appear{from{opacity:0}to{opacity:1}}header{display:flex;justify-content:space-between;align-items:center;position:absolute;inset:0 0 auto;padding:18px clamp(18px,3vw,52px)}.brand{direction:ltr;unicode-bidi:isolate;display:inline-flex;align-items:center;gap:8px;font-weight:650;font-size:16px;user-select:none}.brand em{font-style:normal;font-weight:440;color:#b6c3bf}.brand img{margin-inline-end:3px}button,a,summary,details[open] .notes{pointer-events:auto}button{font:inherit;color:inherit}#lang{cursor:pointer;border:1px solid #384541;border-radius:20px;background:#101615bb;padding:6px 12px;font-size:12px}main{width:min(620px,92%);margin:auto;text-align:center;padding:clamp(230px,62svh,870px) 0 40px;display:flex;flex-direction:column;align-items:center}.channel{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:11px/1.5 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.16em;color:#b1cec6;background:rgba(16,33,28,0.7);border:1px solid rgba(41,66,55,0.9);padding:5px 14px;border-radius:20px;margin-bottom:20px;width:max-content;backdrop-filter:blur(6px)}.channel i{width:5px;height:5px;border-radius:50%;background:#76dbca}h1{font-size:clamp(29px,4.7vw,56px);line-height:1.12;letter-spacing:-.05em;font-weight:550;margin:8px 0 20px;text-shadow:0 2px 12px #0a0c0e}.installer{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#eef3ef;font-weight:600;border-radius:10px;border:1px solid transparent;padding:13px 25px;background:linear-gradient(115deg,#132321,#191b18) padding-box,linear-gradient(100deg,#75d6c5,#acc8bc,#d8ab72) border-box;box-shadow:0 0 20px rgba(63,217,200,0.15);transition:all .25s ease}.installer:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 30px rgba(63,217,200,0.35)}.installer:disabled{cursor:not-allowed}.installer svg{color:#99d6c8}small{display:block;margin-top:12px;margin-bottom:8px;color:#a0b0a9;font-size:12px}small[hidden],#release-detail:empty{display:none}details{margin:18px auto 0;font-size:13px}summary{cursor:pointer;width:max-content;margin:auto;color:#b1c2b9;padding:4px 10px}.notes{margin:16px auto 0;text-align:start;color:#c3d0ca;background:#0a0c0edc;border-inline-start:1px solid #64877b;padding:2px 16px;max-width:55ch}button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid #86dfcc;outline-offset:4px}[dir=rtl] h1{letter-spacing:0}@media(prefers-reduced-motion:reduce){.assembled #ui{animation:none}}
+
+.platform-notice{margin-bottom:14px;padding:6px 14px;border-radius:16px;background:rgba(242,180,92,0.12);border:1px solid rgba(242,180,92,0.4);color:#f2b45c;font-size:12px;max-width:440px}
+.release-meta{display:none;margin-top:14px;padding:12px 16px;border-radius:10px;background:#0d1211d0;border:1px solid #233530;font-size:12px;color:#a8bdb5;max-width:520px;text-align:start;line-height:1.6}
+.release-meta-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:4px}
+.release-meta-row:last-child{margin-bottom:0}
+.release-meta-label{color:#6c827a;font-family:ui-monospace,monospace;font-size:11px}
+.release-meta-val{color:#eef3ef;font-family:ui-monospace,monospace;word-break:break-all}
+.sha-box{display:flex;align-items:center;gap:6px;background:#080b0a;padding:4px 8px;border-radius:6px;border:1px solid #1a2522;margin-top:4px}
+.sha-text{font-size:11px;color:#91e6d1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.copy-btn{border:0;background:#152420;color:#91e6d1;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;font-family:ui-monospace,monospace}
+.copy-btn:hover{background:#1f3630}
+.notes-link{color:#91e6d1;text-decoration:underline;text-underline-offset:3px}
+.manifest-error{display:none;margin-top:10px;color:#f87171;font-size:12px;background:rgba(239,68,68,0.08);padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.25)}
+</style><title>Quantum IDE · Friends Beta</title></head>
+<body><canvas id="c" aria-hidden="true"></canvas><div id="ui"><header><span class="brand" dir="ltr"><img src="./quantum-logo.svg" style="filter: drop-shadow(0 0 10px rgba(0,240,255,0.45));" alt="" width="28" height="28">Quantum <em>IDE</em></span><button id="lang"><span aria-hidden="true">EN / </span><span data-ar="English">العربية</span></button></header>
+<main>
+  <div class="channel"><i></i><span data-ar="بيتا الأصدقاء">Friends Beta</span></div>
+  <div id="platform-notice" class="platform-notice" style="display:none;" data-ar="نسخة Friends Beta الحالية مخصصة لنظام Windows x64 فقط. سيتم توفير نسخ macOS و Linux لاحقًا.">Friends Beta is currently available for Windows x64 only. macOS and Linux versions are planned for future releases.</div>
+  <button id="installer-btn" class="installer" disabled aria-describedby="availability">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/>
+    </svg>
+    <span id="btn-text" data-ar="تنزيل مثبت البرنامج">Download installer</span>
+  </button>
+  <small id="availability" data-ar="رابط ملف التثبيت غير متاح حاليًا.">Installer link not yet available.</small>
+  <div id="manifest-error" class="manifest-error" data-ar="تعذر الاتصال بمركز التوزيع لجلب بيانات الإصدار.">Could not fetch release metadata from distribution center.</div>
+  <div id="release-meta" class="release-meta">
+    <div class="release-meta-row">
+      <span class="release-meta-label" data-ar="الإصدار:">Version:</span>
+      <span class="release-meta-val" id="meta-version">—</span>
+    </div>
+    <div class="release-meta-row">
+      <span class="release-meta-label" data-ar="الحجم:">Size:</span>
+      <span class="release-meta-val" id="meta-size">—</span>
+    </div>
+    <div class="release-meta-row">
+      <span class="release-meta-label" data-ar="تاريخ النشر:">Published:</span>
+      <span class="release-meta-val" id="meta-date">—</span>
+    </div>
+    <div style="margin-top:6px;">
+      <span class="release-meta-label">SHA-256 Checksum:</span>
+      <div class="sha-box">
+        <span class="sha-text" id="meta-sha">—</span>
+        <button type="button" class="copy-btn" id="copy-sha-btn" data-ar="نسخ">Copy</button>
+      </div>
+    </div>
+    <div style="margin-top:8px;text-align:end;">
+      <a id="meta-notes-link" class="notes-link" href="#" target="_blank" rel="noopener" data-ar="ملاحظات الإصدار الكاملة ←">Full Release Notes →</a>
+    </div>
+  </div>
+<details><summary data-ar="ملاحظات بيتا">Beta notes</summary><div class="notes"><p data-ar="يجمع Quantum IDE بين أساس VS Code ووكيل الذكاء الاصطناعي الخاص به في بيئة تطوير واحدة لسطح المكتب.">Quantum IDE brings a VS Code foundation and its own AI agent together in one desktop development environment.</p><p data-ar="يتوفر Quantum حاليًا كإصدار بيتا للأصدقاء. لا تزال بعض الميزات قيد التطوير وقد تحتوي على أخطاء أو سلوك غير متوقع.">Quantum is currently available as a Friends Beta. Some features are still under active development and may contain bugs or unexpected behavior.</p><p data-ar="استخدام المتصفح واستخدام الحاسوب ميزتان تجريبيتان. يرجى تجنب الاعتماد عليهما حتى صدور تحديثات أخرى.">Browser and Computer Use are experimental. Please avoid relying on these features until further updates.</p></div></details></main></div><script>
+(function initDistribution(){
+  const MANIFEST_URL = './channels/friends-beta/windows-x64.json?_t=' + Date.now();
+  const btn = document.getElementById('installer-btn');
+  const btnText = document.getElementById('btn-text');
+  const avail = document.getElementById('availability');
+  const metaBox = document.getElementById('release-meta');
+  const errorBox = document.getElementById('manifest-error');
+  const platformNotice = document.getElementById('platform-notice');
+  const langBtn = document.getElementById('lang');
+
+  // OS detection for non-Windows platforms
+  const userAgent = navigator.userAgent || '';
+  const isWindows = /Windows|Win32|Win64/i.test(userAgent);
+  if (!isWindows && platformNotice) {
+    platformNotice.style.display = 'block';
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes || isNaN(bytes)) return null;
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 1000) return (mb / 1024).toFixed(2) + ' GB';
+    return mb.toFixed(1) + ' MB';
+  }
+
+  function formatDate(isoStr) {
+    if (!isoStr) return null;
+    try {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch { return isoStr; }
+  }
+
+  fetch(MANIFEST_URL)
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(manifest => {
+      const isAvailable = Boolean(manifest && manifest.available && manifest.downloadUrl);
+      if (isAvailable) {
+        // Enable installer button as a direct link or download action
+        const link = document.createElement('a');
+        link.id = 'installer-btn';
+        link.className = 'installer';
+        link.href = manifest.downloadUrl;
+        link.setAttribute('download', manifest.fileName || '');
+        link.setAttribute('rel', 'noopener');
+        
+        // Retain child SVG & localized text
+        const svg = btn.querySelector('svg');
+        if (svg) link.appendChild(svg.cloneNode(true));
+        const textSpan = document.createElement('span');
+        textSpan.id = 'btn-text';
+        textSpan.setAttribute('data-ar', 'تنزيل مثبت البرنامج (' + (manifest.version || '') + ')');
+        textSpan.textContent = 'Download installer (' + (manifest.version || '') + ')';
+        link.appendChild(textSpan);
+
+        btn.replaceWith(link);
+        avail.style.display = 'none';
+
+        // Populate metadata box
+        document.getElementById('meta-version').textContent = manifest.version || 'Friends Beta';
+        document.getElementById('meta-size').textContent = formatBytes(manifest.sizeBytes) || '—';
+        document.getElementById('meta-date').textContent = formatDate(manifest.publishedAt) || '—';
+        document.getElementById('meta-sha').textContent = manifest.sha256 || '—';
+
+        const notesLink = document.getElementById('meta-notes-link');
+        if (manifest.releaseNotesUrl) {
+          notesLink.href = manifest.releaseNotesUrl;
+          notesLink.style.display = 'inline-block';
+        } else {
+          notesLink.style.display = 'none';
+        }
+
+        metaBox.style.display = 'block';
+
+        // Copy SHA button
+        const copyBtn = document.getElementById('copy-sha-btn');
+        if (copyBtn && manifest.sha256) {
+          copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(manifest.sha256).then(() => {
+              const orig = copyBtn.textContent;
+              copyBtn.textContent = document.documentElement.lang === 'ar' ? 'تم النسخ!' : 'Copied!';
+              setTimeout(() => { copyBtn.textContent = orig; }, 2000);
+            });
+          });
+        }
+      } else {
+        // Explicitly unavailable
+        btn.disabled = true;
+        avail.style.display = 'block';
+        metaBox.style.display = 'none';
+      }
+      refreshLocalizedNodes();
+    })
+    .catch(err => {
+      console.warn('Distribution manifest could not be loaded:', err);
+      avail.style.display = 'none';
+      errorBox.style.display = 'block';
+      refreshLocalizedNodes();
+    });
+
+  function refreshLocalizedNodes() {
+    window.__distributionLabels = [...document.querySelectorAll('[data-ar]')].map(el => ({
+      el,
+      en: [...el.childNodes].map(n => n.cloneNode(true))
+    }));
+  }
+
+  // Language switcher
+  langBtn.addEventListener('click', () => {
+    const root = document.documentElement;
+    const toAr = root.lang === 'en';
+    root.lang = toAr ? 'ar' : 'en';
+    root.dir = toAr ? 'rtl' : 'ltr';
+
+    if (!window.__distributionLabels) refreshLocalizedNodes();
+    for (const { el, en } of window.__distributionLabels) {
+      if (toAr) {
+        el.textContent = el.dataset.ar;
+      } else {
+        el.replaceChildren(...en.map(n => n.cloneNode(true)));
+      }
+    }
+    document.title = toAr ? 'Quantum IDE · بيتا الأصدقاء' : 'Quantum IDE · Friends Beta';
+  });
+
+  refreshLocalizedNodes();
+})();
+</script>
+<script>(function(){
+var cv=document.getElementById('c'),ctx=cv.getContext('2d'),ui=document.getElementById('ui');
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches,DPR=Math.min(devicePixelRatio||1,2),TAU=Math.PI*2;
+var W=0,H=0,R=1,FS=100,CX=0,CY=0,SC=1,SP=60,TB={x0:0,y0:0,x1:1,y1:1};
+var P=[],G=[],N=[],E=[],pulses=[],rings=[],kicks=[],EV=[];
+var mouse={x:-9999,y:-9999},T=0,last=0,TC=RM?0:.45,fired=RM,asmT=RM?1e-3:0,shown=false,burst=0,boost=0,nextP=1.1;
+
+// Everything is integrated in px and seconds, so the motion is identical at 60, 120 or 144 Hz.
+// K1/C1: loose, underdamped spring that lets a particle orbit its letter's vortex.
+// K2/C2: stiff spring (zeta ~ 0.56) that snaps it into the glyph with one small overshoot.
+var K1=50,C1=7.5,K2=260,C2=18;
+
+// palette: graphite + quantum teal (|0>) + gold (|1>), ice-white between them
+var TEAL=[63,217,200],ICE=[234,242,239],AMB=[242,180,92],LUT=[],STY=[];
+function mx(a,b,k){return[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k,a[2]+(b[2]-a[2])*k]}
+function rgba(c,a){return 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')'}
+for(var li=0;li<=64;li++){var lu=li/64;LUT.push(lu<.5?mx(TEAL,ICE,lu*2):mx(ICE,AMB,(lu-.5)*2))}
+// cached fill styles: 65 hues x 5 glow steps x 20 alpha steps
+function sty(ci,gk,al){
+  var gi=(gk*4+.5)|0,ai=(al*20+.5)|0;if(ai<1)return null;if(ai>20)ai=20;
+  var key=(ci*5+gi)*21+ai,s=STY[key];
+  if(!s){var c=LUT[ci],k=gi/4*0.8;s=STY[key]='rgba('+((c[0]+(234-c[0])*k)|0)+','+((c[1]+(242-c[1])*k)|0)+','+((c[2]+(239-c[2])*k)|0)+','+(ai/20)+')'}
+  return s}
+
+// qubit lattice: brick-wall layout (every node has 2-3 neighbours, like a real chip)
+function lattice(){
+  SP=Math.max(46,Math.min(84,Math.min(W,H)/11));
+  var cols=Math.ceil(W/SP)+2,rows=Math.ceil(H/SP)+2,dg=Math.hypot(W,H)/2,r,c;
+  N=[];E=[];
+  for(r=0;r<rows;r++)for(c=0;c<cols;c++){
+    var x=c*SP-SP/2,y=r*SP-SP/2;
+    N.push({x:x,y:y,px:x,py:y,nb:[],ph:Math.random()*TAU,fl:0,fc:ICE,m:0,v:Math.max(0,Math.min(1,0.2+Math.hypot(x-CX,y-CY)/dg*1.4))});
+  }
+  function link(a,b){N[a].nb.push(b);N[b].nb.push(a);E.push([a,b])}
+  for(r=0;r<rows;r++)for(c=0;c<cols;c++){var i=r*cols+c;
+    if(c+1<cols)link(i,i+1);
+    if(r+1<rows&&(r+c)%2===0)link(i,i+cols);
+  }
+}
+function walk(a,b,h){var p=[a,b],prev=a,cur=b;
+  while(--h>0){var o=N[cur].nb.filter(function(q){return q!==prev});if(!o.length)break;prev=cur;cur=o[Math.random()*o.length|0];p.push(cur)}
+  return p}
+// entangled pair: two signals leave one node in opposite directions
+function spawn(){
+  var a=Math.random()*N.length|0,nb=N[a].nb;if(nb.length<2)return;
+  var i=Math.random()*nb.length|0,j=(i+1+(Math.random()*(nb.length-1)|0))%nb.length,h=4+(Math.random()*4|0),sp=2+Math.random()*.7;
+  pulses.push({path:walk(a,nb[i],h),pos:0,k:0,sp:sp,c:TEAL},{path:walk(a,nb[j],h),pos:0,k:0,sp:sp,c:AMB});
+  N[a].fl=1;N[a].fc=ICE;
+}
+function at(p,f){var i=Math.min(Math.floor(f),p.length-2),k=f-i,a=N[p[i]],b=N[p[i+1]];return{x:a.px+(b.px-a.px)*k,y:a.py+(b.py-a.py)*k}}
+
+// three orbitals: different tilt, size and direction, slowly precessing
+var OR=[{t:-.38,e:.17,w:.7,c:TEAL},{t:.02,e:.21,w:-.55,c:ICE},{t:.38,e:.25,w:.9,c:AMB}];
+OR.forEach(function(o,i){o.tr=[];o.ag=i*2.1;o.x=0;o.y=0;o.z=.5;o.tl=o.t;o.tt=0;o.on=false});
+
+function build(){
+  var nw=cv.clientWidth,nh=cv.clientHeight;if(nw<2||nh<2||(nw===W&&nh===H))return;
+  W=nw;H=nh;R=Math.min(W,H);
+  // the wordmark sizes and centres itself in the space above the sign-in panel
+  FS=Math.min(W/6.45,H/2.7,184);CX=W/2;CY=H*.35;SC=Math.max(.45,Math.min(1.6,FS/170));
+  cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  var y0=CY-FS*0.41,off=document.createElement('canvas'),o=off.getContext('2d',{willReadFrequently:true}),F='px "Segoe UI","Helvetica Neue",Arial,sans-serif';
+  off.width=W;off.height=H;o.fillStyle='#fff';o.textAlign='center';o.textBaseline='middle';
+  var s1='QUANTUM',s2='I D E',b1=[],b2=[],i;
+  o.font='900 '+FS+F;var x1=CX-o.measureText(s1).width/2;for(i=0;i<=7;i++)b1.push(x1+o.measureText(s1.slice(0,i)).width);o.fillText(s1,CX,y0);
+  o.font='800 '+FS*0.62+F;var x2=CX-o.measureText(s2).width/2;for(i=0;i<=5;i++)b2.push(x2+o.measureText(s2.slice(0,i)).width);o.fillText(s2,CX,y0+FS*0.82);
+  var m1=(b2[1]+b2[2])/2,m2=(b2[3]+b2[4])/2,split=y0+FS*0.52;
+  var ya=Math.max(0,Math.floor(y0-FS*0.7)),yb=Math.min(H,Math.ceil(y0+FS*1.35)),gap=Math.max(2,Math.round(FS/36)),pts=[];
+  var d=yb>ya?o.getImageData(0,ya,W,yb-ya).data:[];
+
+  // one record per letter: each becomes its own vortex, then collapses on its own schedule
+  var settled=RM||fired,x,y,gi,g;
+  G=[];for(i=0;i<10;i++)G.push({n:0,cx:0,cy:0,u:.5,near:0,flash:0,locked:settled,dir:i%2?1:-1,tilt:(Math.random()-.5)*1.3,th0:Math.random()*TAU,
+    T:TC+(i<7?0.8+i*0.085:1.52+(i-7)*0.13)});
+  TB={x0:1e9,y0:1e9,x1:-1e9,y1:-1e9};
+  for(y=ya;y<yb;y+=gap)for(x=0;x<W;x+=gap)if(d[((y-ya)*W+x)*4+3]>128){
+    if(y<split){gi=6;for(i=1;i<7;i++)if(x<b1[i]){gi=i-1;break}}else gi=x<m1?7:x<m2?8:9;
+    pts.push(x,y,gi);g=G[gi];g.n++;g.cx+=x;g.cy+=y;
+    if(x<TB.x0)TB.x0=x;if(x>TB.x1)TB.x1=x;if(y<TB.y0)TB.y0=y;if(y>TB.y1)TB.y1=y}
+  var tw=Math.max(1,TB.x1-TB.x0);
+  for(i=0;i<10;i++){g=G[i];if(g.n){g.cx/=g.n;g.cy/=g.n}else{g.cx=CX;g.cy=CY}g.u=Math.max(0,Math.min(1,(g.cx-TB.x0)/tw));g.ct=Math.cos(g.tilt);g.st=Math.sin(g.tilt)}
+
+  var old=P;P=[];
+  for(i=0;i<pts.length;i+=3){
+    var tx=pts[i],ty=pts[i+1];gi=pts[i+2];g=G[gi];
+    var q=(Math.random()+Math.random()+Math.random())/3,a=Math.random()*TAU,r=R*(0.08+q*0.62),rho=Math.sqrt(Math.random()),
+        fr=((((Math.atan2(ty-g.cy,tx-g.cx)-g.th0)*g.dir)%TAU)+TAU)%TAU/TAU,op=old[i/3];
+    P.push({x:settled?(op?op.x:tx):CX+Math.cos(a)*r*1.5,y:settled?(op?op.y:ty):CY+Math.sin(a)*r*0.7,vx:0,vy:0,tx:tx,ty:ty,g:gi,u:(tx-TB.x0)/tw,
+      a:a,r:r,w:0.25+(1-q)*0.9,m:0.75+Math.random()*0.6,
+      rel:(0.08+q*0.62)/0.7*0.3+Math.random()*0.14,   // the collapse front frees the inner disk first
+      lk:fr*0.26+Math.random()*0.04,                  // each letter is swept into place by one turn of its vortex
+      va:Math.random()*TAU,vr:0.12+0.88*rho,vw:(3+4*Math.random())/(0.5+rho),
+      ph:Math.random()*TAU,s:1+Math.random()*1.3,mode:settled?2:0,k:-9,gl:0});
+  }
+  for(i=0;i<3;i++)OR[i].tr=[];
+  lattice();pulses=[];
+}
+
+function showUI(){if(!shown){shown=true;document.body.classList.remove('assembling');document.body.classList.add('assembled')}}
+function ring(x,y,o){o.x=x;o.y=y;o.t0=T;o.q=0;o.rad=0;o.k=1;rings.push(o)}
+function mainRing(pa){ring(CX,CY,{dur:.95,R:Math.max(W,H)*.85,amp:16,w:80,pa:pa,fl:.7,c1:TEAL,c2:AMB,lw:5,a:.65})}
+function collapse(){fired=true;burst=1.6;mainRing(0)}
+// a letter has crystallised: it rings like a struck bell and the lattice under it answers
+function lock(gi){
+  var g=G[gi],c=LUT[Math.round(g.u*64)];g.locked=true;g.flash=1;
+  for(var i=0;i<P.length;i++){var p=P[i];if(p.g!==gi)continue;
+    var dx=p.tx-g.cx,dy=p.ty-g.cy,l=Math.sqrt(dx*dx+dy*dy)||1,f=(30+70*Math.random())*SC;p.vx+=dx/l*f;p.vy+=dy/l*f}
+  ring(g.cx,g.cy,{dur:.55,R:FS*.75,amp:5,w:34,pa:0,fl:.5,fc:c,c1:c,c2:ICE,lw:2,a:.45});
+}
+function beat(){
+  ring(CX,CY,{dur:1.5,R:Math.max(FS*4.5,R*.6),amp:6,w:55,pa:800,fl:.35,c1:TEAL,c2:AMB,lw:2,a:.16});
+  EV.push([T+8+Math.random()*5,beat]);
+}
+function shock(x,y){
+  burst=Math.max(burst,.6);
+  ring(x,y,{dur:.8,R:Math.max(280,R*.6),amp:10,w:46,pa:3200,fl:.8,c1:TEAL,c2:AMB,lw:3.5,a:.6});
+}
+function launch(){
+  boost=1;burst=Math.max(burst,1);mainRing(2200);
+  for(var i=0;i<10;i++)EV.push([T+i*0.045,(function(i){return function(){if(G[i])G[i].flash=1}})(i)]);
+}
+
+function tick(dt){
+  T+=dt;
+  var t=T,tau=t-TC,i,j,n,q,z,f,l,dx,dy,d2,rg,g,f60=Math.min(2.5,dt*60),vis=RM?1:Math.min(1,t/0.9);
+  ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='rgba(10,12,14,'+(1-Math.exp(-19.7*dt)).toFixed(3)+')';ctx.fillRect(0,0,W,H);
+
+  for(i=EV.length-1;i>=0;i--)if(EV[i][0]<=t){var fn=EV[i][1];EV.splice(i,1);fn()}
+  if(!fired&&t>=TC)collapse();
+
+  // the cloud contracts, and because angular momentum is conserved it spins up as 1/r^2
+  var wind=Math.max(0,Math.min(1,(t-(TC-0.5))/0.5)),gather=1-0.4*(TC?Math.min(1,t/TC):1)-0.2*wind*wind*wind,spin=1/(gather*gather);
+  // its mass dents the lattice; at collapse the dent is released and the membrane rings down
+  var A0=0.5*SP,ws=0.22*R,wellA=RM?A0*0.14:tau<0?A0*(1-gather)/0.6:A0*Math.exp(-3.2*tau)*Math.cos(9*tau);
+  if(asmT&&!RM)wellA+=A0*0.14*Math.min(1,(t-asmT)/2)*(1+0.35*Math.sin(t*0.7));
+
+  for(i=rings.length-1;i>=0;i--){rg=rings[i];q=(t-rg.t0)/rg.dur;if(q>1.15){rings.splice(i,1);continue}rg.q=q;rg.rad=q*rg.R;rg.k=Math.max(0,1-q)}
+
+  // --- qubit lattice (an elastic membrane: gravity well + travelling shock fronts + pointer) ---
+  for(i=0;i<N.length;i++){var nd=N[i],ox=0,oy=0;
+    dx=nd.x-mouse.x;dy=nd.y-mouse.y;var md=Math.sqrt(dx*dx+dy*dy);
+    nd.m=md<200?1-md/200:0;if(nd.fl>0)nd.fl=Math.max(0,nd.fl-dt*1.5);
+    if(nd.m>0&&md>1){f=nd.m*nd.m*9;ox+=dx/md*f;oy+=dy/md*f}
+    dx=nd.x-CX;dy=nd.y-CY;l=Math.sqrt(dx*dx+dy*dy)||1;f=wellA*(l/ws)*Math.exp(1-l/ws);ox-=dx/l*f;oy-=dy/l*f;
+    for(j=0;j<rings.length;j++){rg=rings[j];if(rg.k<=0)continue;
+      dx=nd.x-rg.x;dy=nd.y-rg.y;l=Math.sqrt(dx*dx+dy*dy)||1;z=(l-rg.rad)/rg.w;
+      if(z*z<8){var gz=Math.exp(-z*z);f=rg.amp*rg.k*gz;ox+=dx/l*f;oy+=dy/l*f;
+        if(gz>.6&&rg.fl*rg.k>nd.fl){nd.fl=rg.fl*rg.k;nd.fc=rg.fc||ICE}}}
+    nd.px=nd.x+ox;nd.py=nd.y+oy}
+  ctx.lineWidth=1;
+  for(i=0;i<E.length;i++){var a=N[E[i][0]],b=N[E[i][1]];
+    ctx.strokeStyle='rgba(160,190,184,'+((0.045*(a.v+b.v)/2+0.1*(a.m+b.m)/2)*vis)+')';
+    ctx.beginPath();ctx.moveTo(a.px,a.py);ctx.lineTo(b.px,b.py);ctx.stroke()}
+  for(i=0;i<N.length;i++){nd=N[i];
+    ctx.fillStyle='rgba(170,200,192,'+(((0.07+0.04*Math.sin(t*0.9+nd.ph))*nd.v+nd.m*0.35)*vis)+')';
+    ctx.fillRect(nd.px-1.2,nd.py-1.2,2.4,2.4);
+    if(nd.fl>0){ctx.strokeStyle=rgba(nd.fc,nd.fl*0.55);ctx.beginPath();ctx.arc(nd.px,nd.py,(1-nd.fl)*SP*0.45+2,0,TAU);ctx.stroke();
+      ctx.fillStyle=rgba(nd.fc,nd.fl*0.9);ctx.fillRect(nd.px-2,nd.py-2,4,4)}}
+
+  // entangled signals travelling along the lattice; each node they hit under the name plucks it
+  nextP-=dt;if(!RM&&nextP<0&&t>0.6&&pulses.length<12){spawn();nextP=0.7+Math.random()*1.1}
+  ctx.lineCap='round';
+  for(i=pulses.length-1;i>=0;i--){var pl=pulses[i],L=pl.path.length;pl.pos+=dt*pl.sp;
+    var hd=Math.min(Math.floor(pl.pos),L-1);
+    while(pl.k<hd){pl.k++;var nn=N[pl.path[pl.k]];nn.fl=1;nn.fc=pl.c;
+      if(asmT&&nn.px>TB.x0-SP&&nn.px<TB.x1+SP&&nn.py>TB.y0-SP&&nn.py<TB.y1+SP)kicks.push(nn.px,nn.py)}
+    if(pl.pos-1>L-1){pulses.splice(i,1);continue}
+    var f1=Math.min(pl.pos,L-1),f0=Math.max(0,pl.pos-1),px=null,pt;
+    for(j=0;j<=8;j++){pt=at(pl.path,f0+(f1-f0)*j/8);
+      if(px){ctx.strokeStyle=rgba(pl.c,0.06+0.7*j/8);ctx.lineWidth=1+2*j/8;ctx.beginPath();ctx.moveTo(px.x,px.y);ctx.lineTo(pt.x,pt.y);ctx.stroke()}
+      px=pt}
+    if(pl.pos<L-1){ctx.globalCompositeOperation='lighter';var gh=ctx.createRadialGradient(px.x,px.y,0,px.x,px.y,12);
+      gh.addColorStop(0,rgba(pl.c,0.6));gh.addColorStop(1,rgba(pl.c,0));ctx.fillStyle=gh;ctx.fillRect(px.x-12,px.y-12,24,24);ctx.globalCompositeOperation='source-over'}
+  }
+
+  // core: energy density rises as the cloud gathers, then flashes at the moment of collapse
+  var ce=RM?0:tau<0?0.05*(1-gather)/0.6*vis:0.42*Math.exp(-5.5*tau);
+  if(ce>0.004){var cr=tau<0?R*0.34*gather:R*(0.14+0.9*tau);
+    ctx.globalCompositeOperation='lighter';var cg=ctx.createRadialGradient(CX,CY,0,CX,CY,cr);
+    cg.addColorStop(0,rgba(ICE,ce*f60));cg.addColorStop(.35,rgba(TEAL,ce*f60*0.5));cg.addColorStop(1,rgba(TEAL,0));
+    ctx.fillStyle=cg;ctx.fillRect(CX-cr,CY-cr,cr*2,cr*2);ctx.globalCompositeOperation='source-over'}
+
+  // --- electrons: born in the core, they spiral out to their orbits (again spinning down as 1/r^2) ---
+  var rx0=Math.min(W*0.38,W/2-30),te=RM?0:t,Re=Math.max(36,FS*0.42),Re2=Re*Re,o;
+  if(fired)for(i=0;i<3;i++){o=OR[i];var s=1;
+    if(!RM){var xx=Math.min(1,Math.max(0,tau)/2.6);s=0.04+0.96*(1-(1-xx)*(1-xx));o.ag+=o.w*Math.min(8,1/(s*s))*(1+3*boost)*dt}
+    var rx=rx0*(1-i*0.05)*s,ry=rx*o.e,ex=Math.cos(o.ag)*rx,ey=Math.sin(o.ag)*ry;
+    o.tl=o.t+Math.sin(te*0.18+i*2)*0.07;
+    o.x=CX+ex*Math.cos(o.tl)-ey*Math.sin(o.tl);o.y=CY+ex*Math.sin(o.tl)+ey*Math.cos(o.tl);o.z=(Math.sin(o.ag)+1)/2;
+    o.on=o.x>TB.x0-Re&&o.x<TB.x1+Re&&o.y>TB.y0-Re&&o.y<TB.y1+Re}
+  if(boost>0.001)boost*=Math.exp(-1.2*dt);else boost=0;
+
+  // Stable orbital dust makes the paths visible between electron passes.
+  ctx.save();ctx.translate(CX,CY);
+  for(var band=0;band<2;band++){
+    ctx.save();ctx.rotate(band===0?-.24:.29);
+    for(var dust=0;dust<480;dust++){
+      var seed=Math.sin(dust*78.233+band*37)*43758.5453,noise=seed-Math.floor(seed),angle=dust*2.39996+(RM?0:t*.015)*(band?-1:1),radius=rx0*(.85+.35*noise),sx=Math.cos(angle)*radius,sy=Math.sin(angle)*radius*.23+(noise-.5)*H*.075;
+      ctx.fillStyle=rgba(band?AMB:TEAL,.055+.28*noise*noise);ctx.fillRect(sx,sy,noise>.94?1.6:.85,noise>.94?1.6:.85);
+    }ctx.restore();
+  }ctx.restore();
+  // --- wordmark particles ---
+  var wave=RM?-9:((t*0.55)%1.6)-0.3,D1=Math.exp(-C1*dt),D2=Math.exp(-C2*dt),turb=320*SC,
+      ms=Math.max(.55,Math.min(1.25,SC)),MR2=14000*ms*ms,MA=14000,KR2=SP*SP*0.72,jon=asmT&&!RM;
+  for(n=0;n<P.length;n++){var p=P[n],glow=0;g=G[p.g];
+    if(asmT && !RM && t>asmT+.4 && n%17===0){
+      if(!p.free){p.free=true;p.vx=Math.cos(p.a)*(10+18*p.m);p.vy=Math.sin(p.a)*(9+15*p.m)}
+      p.x=(p.x+(p.vx+5*Math.sin(t*.18+p.ph))*dt+W)%W;p.y=(p.y+(p.vy+6*Math.cos(t*.14+p.ph))*dt+H)%H;
+      ctx.fillStyle=sty(Math.round(p.u*64),0,.16+.09*Math.sin(p.ph+t*.4));ctx.fillRect(p.x,p.y,p.s,p.s);continue;
+    }
+    if(p.mode===0){
+      // superposition: a Keplerian disk around the core
+      p.a+=p.w*spin*dt;
+      var qx=CX+Math.cos(p.a)*p.r*gather*1.5,qy=CY+Math.sin(p.a)*p.r*gather*0.7;
+      p.vx=(qx-p.x)/dt;p.vy=(qy-p.y)/dt;p.x=qx;p.y=qy;
+      if(fired&&tau>=p.rel){p.mode=1;p.k=t;l=Math.sqrt(p.vx*p.vx+p.vy*p.vy);if(l>1400){p.vx*=1400/l;p.vy*=1400/l}}
+    }else{
+      var ax=0,ay=0,dm;
+      if(p.mode===1&&t>=g.T+p.lk){p.mode=2;p.k=t}
+      if(p.mode===1){
+        // freed: it keeps its orbital velocity and is captured by its letter's vortex
+        // (QUANTUM letters spin in place; the I, D and E swarms ride the three electrons as comet tails)
+        var ccx=g.cx,ccy=g.cy,rr=FS*0.28;
+        if(p.g>6){o=OR[p.g-7];ccx=o.x;ccy=o.y;rr=FS*0.13}
+        var th=p.va+g.dir*p.vw*tau,vx_=Math.cos(th)*p.vr*rr,vy_=Math.sin(th)*p.vr*rr*0.55;
+        f=K1*Math.min(1,(t-p.k)/0.35)/p.m;
+        ax=(ccx+vx_*g.ct-vy_*g.st-p.x)*f+Math.sin(p.y*0.013+t*1.9+p.ph)*turb;
+        ay=(ccy+vx_*g.st+vy_*g.ct-p.y)*f+Math.cos(p.x*0.013-t*1.6+p.ph)*turb;
+        dm=D1;
+      }else{
+        // measured: spring into the glyph, still carrying the swirl it had
+        f=K2*Math.min(1,0.25+(t-p.k)/0.12)/p.m;ax=(p.tx-p.x)*f;ay=(p.ty-p.y)*f;dm=D2;
+        // tidal pull of a passing electron
+        for(j=0;j<3;j++){o=OR[j];if(!o.on)continue;dx=o.x-p.x;dy=o.y-p.y;d2=dx*dx+dy*dy;
+          if(d2<Re2){f=1-d2/Re2;l=Math.sqrt(d2)||1;var ta=3400*f*f*(0.45+0.55*o.z);ax+=dx/l*ta;ay+=dy/l*ta;if(f*0.7>p.gl)p.gl=f*0.7}}
+      }
+      // pointer: repulsion with a little swirl
+      dx=p.x-mouse.x;dy=p.y-mouse.y;d2=dx*dx+dy*dy;
+      if(d2<MR2){f=(1-d2/MR2)*MA;l=Math.sqrt(d2)||1;ax+=(dx-dy*0.4)/l*f;ay+=(dy+dx*0.4)/l*f}
+      // shock fronts push whatever they pass through
+      for(j=0;j<rings.length;j++){rg=rings[j];if(!rg.pa||rg.k<=0)continue;
+        dx=p.x-rg.x;dy=p.y-rg.y;l=Math.sqrt(dx*dx+dy*dy)||1;z=(l-rg.rad)/rg.w;
+        if(z*z<7){f=Math.exp(-z*z)*rg.k;ax+=dx/l*f*rg.pa;ay+=dy/l*f*rg.pa;if(f*0.8>p.gl)p.gl=f*0.8}}
+      for(j=0;j<kicks.length;j+=2){dx=p.x-kicks[j];dy=p.y-kicks[j+1];d2=dx*dx+dy*dy;
+        if(d2<KR2){f=1-d2/KR2;l=Math.sqrt(d2)||1;p.vx+=dx/l*f*90*SC;p.vy+=dy/l*f*90*SC;if(f>p.gl)p.gl=f}}
+      p.vx=(p.vx+ax*dt)*dm;p.vy=(p.vy+ay*dt)*dm;p.x+=p.vx*dt;p.y+=p.vy*dt;
+      if(p.mode===2){dx=p.tx-p.x;dy=p.ty-p.y;if(dx*dx+dy*dy<6)g.near++}
+      if(g.locked)glow=Math.max(0,1-Math.abs(p.u-wave)*5)+g.flash;
+      if(p.gl>0){glow+=p.gl;p.gl=Math.max(0,p.gl-dt*2.6)}
+    }
+    var gk=glow>1?1:glow,ci=((p.u+Math.sin(t*1.2+p.u*5)*0.09)*64+.5)|0,sz=p.s*(1+gk*1.6),jit=jon?Math.sin(t*3+p.ph)*0.6:0,
+        st=sty(ci<0?0:ci>64?64:ci,gk,(p.mode?0.7:0.45)*vis+gk*0.3);
+    if(st){ctx.fillStyle=st;ctx.fillRect(p.x+jit-sz/2,p.y+jit*0.7-sz/2,sz,sz);
+      if(gk>0.55){ctx.fillStyle=sty(ci<0?0:ci>64?64:ci,gk,0.06);ctx.fillRect(p.x-6,p.y-6,12,12)}}
+  }
+  kicks.length=0;
+
+  // a letter locks the instant enough of it has come to rest
+  var all=G.length>0;
+  for(i=0;i<G.length;i++){g=G[i];
+    if(!g.locked){if(fired&&t>=g.T&&(g.near>=g.n*0.8||t>g.T+1.1))lock(i);else all=false}
+    if(g.flash>0){var hr=FS*0.6;ctx.globalCompositeOperation='lighter';var hg=ctx.createRadialGradient(g.cx,g.cy,0,g.cx,g.cy,hr);
+      hg.addColorStop(0,rgba(LUT[Math.round(g.u*64)],0.09*g.flash*f60));hg.addColorStop(1,rgba(TEAL,0));
+      ctx.fillStyle=hg;ctx.fillRect(g.cx-hr,g.cy-hr,hr*2,hr*2);ctx.globalCompositeOperation='source-over';
+      g.flash=Math.max(0,g.flash-dt*2.4)}
+    g.near=0}
+  if(all&&!asmT){asmT=t;EV.push([t+.35,showUI],[t+6,beat])}
+
+  // shock fronts: leading edge, with an echo just behind it
+  for(i=0;i<rings.length;i++){rg=rings[i];
+    for(j=0;j<2;j++){q=rg.q-j*0.12;if(q<0||q>1)continue;
+      ctx.strokeStyle=rgba(j?rg.c2:rg.c1,rg.a*(1-q));ctx.lineWidth=1.5+(1-q)*rg.lw;
+      ctx.beginPath();ctx.arc(rg.x,rg.y,q*rg.R,0,TAU);ctx.stroke()}}
+
+  // --- orbitals ---
+  if(fired){
+    var ke=RM?1:Math.min(1,tau/0.35),kg=asmT?Math.min(1,(t-asmT)/1.4):0;
+    for(i=0;i<3;i++){o=OR[i];
+      if(kg>0||RM){var rf=rx0*(1-i*0.05);ctx.strokeStyle='rgba(200,225,220,'+(0.19*(RM?1:kg))+')';ctx.lineWidth=1;
+        ctx.beginPath();ctx.ellipse(CX,CY,rf,rf*o.e,o.tl,0,TAU);ctx.stroke()}
+      var x=o.x,y=o.y,zz=o.z,sc=0.7+0.3*zz;
+      o.tt+=dt;if(o.tt>=0.014||!o.tr.length){o.tt=0;o.tr.push([x,y,zz]);if(o.tr.length>40)o.tr.shift()}
+      for(j=1;j<o.tr.length;j++){var sg=o.tr[j],uu=j/o.tr.length;
+        ctx.strokeStyle=rgba(o.c,uu*uu*0.55*ke*(0.4+0.6*sg[2]));ctx.lineWidth=0.8+uu*2.2*(0.7+0.3*sg[2]);
+        ctx.beginPath();ctx.moveTo(o.tr[j-1][0],o.tr[j-1][1]);ctx.lineTo(sg[0],sg[1]);ctx.stroke()}
+      ctx.globalCompositeOperation='lighter';
+      var go=ctx.createRadialGradient(x,y,0,x,y,20*sc);go.addColorStop(0,rgba(o.c,(0.35+0.4*zz)*ke));go.addColorStop(1,rgba(o.c,0));
+      ctx.fillStyle=go;ctx.fillRect(x-22,y-22,44,44);ctx.globalCompositeOperation='source-over';
+      ctx.fillStyle=rgba(ICE,(0.6+0.4*zz)*ke);ctx.beginPath();ctx.arc(x,y,2.2*sc,0,TAU);ctx.fill();
+    }
+  }
+  if(burst>0){ctx.fillStyle='rgba(63,217,200,'+(burst*0.07)+')';ctx.fillRect(0,0,W,H);burst-=2.4*dt}
+}
+
+
+if(RM)showUI();else document.body.classList.add('assembling');
+cv.addEventListener('click',e=>{if(shown&&!RM)shock(e.clientX,e.clientY)});
+build();new ResizeObserver(()=>{build();if(RM)tick(1/60)}).observe(cv);cv.onpointermove=e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top};cv.onpointerleave=()=>{mouse.x=mouse.y=-9999};last=performance.now();function frame(now){let dt=Math.min(.05,(now-last)/1000);last=now;if(dt>0&&W>1)tick(dt);if(!RM)requestAnimationFrame(frame)}requestAnimationFrame(frame);})();
+</script></body></html>

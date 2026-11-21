@@ -1,0 +1,23 @@
+{
+  "$schema": "../../schemas/release-manifest.schema.json",
+  "schemaVersion": "1.0.0",
+  "product": "Quantum IDE",
+  "platform": "windows",
+  "architecture": "x64",
+  "channel": "friends-beta",
+  "version": null,
+  "updateClass": "manual-consent",
+  "publishedAt": null,
+  "available": false,
+  "downloadUrl": null,
+  "fileName": null,
+  "sizeBytes": null,
+  "sha256": null,
+  "releaseNotesUrl": null,
+  "deltaSupport": {
+    "enabled": false,
+    "blockmapUrl": null,
+    "fallbackUrl": null
+  },
+  "minOSVersion": "Windows 10 Build 19041+ (64-bit)"
+}

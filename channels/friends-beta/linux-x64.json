@@ -1,0 +1,23 @@
+{
+  "$schema": "../../schemas/release-manifest.schema.json",
+  "schemaVersion": "1.0.0",
+  "product": "Quantum IDE",
+  "platform": "linux",
+  "architecture": "x64",
+  "channel": "friends-beta",
+  "version": null,
+  "updateClass": "manual-consent",
+  "publishedAt": null,
+  "available": false,
+  "downloadUrl": null,
+  "fileName": null,
+  "sizeBytes": null,
+  "sha256": null,
+  "releaseNotesUrl": null,
+  "deltaSupport": {
+    "enabled": false,
+    "blockmapUrl": null,
+    "fallbackUrl": null
+  },
+  "minOSVersion": "glibc 2.28+ (Ubuntu 20.04+, Debian 10+, Fedora 30+)"
+}

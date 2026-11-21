@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QuantumIDEReleaseManifest",
+  "description": "Defines the release manifest metadata for a specific Quantum IDE distribution channel and platform.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "product",
+    "platform",
+    "architecture",
+    "channel",
+    "available",
+    "updateClass"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Semantic version of the manifest schema format (e.g., 1.0.0)"
+    },
+    "product": {
+      "type": "string",
+      "enum": ["Quantum IDE"],
+      "description": "Product brand identifier"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["windows", "linux", "darwin"],
+      "description": "Operating system platform"
+    },
+    "architecture": {
+      "type": "string",
+      "enum": ["x64", "arm64"],
+      "description": "Target processor architecture"
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["friends-beta", "canary", "stable"],
+      "description": "Distribution channel name"
+    },
+    "version": {
+      "type": ["string", "null"],
+      "description": "Release semver tag (e.g., v0.1.0-beta.1)"
+    },
+    "updateClass": {
+      "type": "string",
+      "enum": ["silent-next-launch", "manual-consent"],
+      "description": "Classification governing how Quantum client consumes the update: silent-next-launch applies on next launch; manual-consent requires explicit user approval."
+    },
+    "publishedAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of release publication"
+    },
+    "available": {
+      "type": "boolean",
+      "description": "Indicates whether a verified installer asset is actively available for download"
+    },
+    "downloadUrl": {
+      "type": ["string", "null"],
+      "description": "Direct HTTPS URL to download the binary installer asset on GitHub Releases"
+    },
+    "fileName": {
+      "type": ["string", "null"],
+      "description": "Canonical filename of the installer asset (e.g., Quantum-Setup-0.1.0-beta.1-x64.exe)"
+    },
+    "sizeBytes": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Exact size of the installer asset in bytes"
+    },
+    "sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "description": "SHA-256 cryptographic digest of the installer file"
+    },
+    "releaseNotesUrl": {
+      "type": ["string", "null"],
+      "description": "URL to public release notes or changelog"
+    },
+    "deltaSupport": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "blockmapUrl": { "type": ["string", "null"] },
+        "fallbackUrl": { "type": ["string", "null"] }
+      }
+    },
+    "minOSVersion": {
+      "type": ["string", "null"],
+      "description": "Minimum supported operating system version"
+    }
+  }
+}
