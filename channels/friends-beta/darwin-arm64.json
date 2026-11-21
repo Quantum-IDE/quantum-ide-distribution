@@ -1,7 +1,6 @@
 {
   "$schema": "../../schemas/release-manifest.schema.json",
-  "schemaVersion": "1.0.0",
-  "product": "Quantum IDE",
+  "schemaVersion": "2.0.0",
   "platform": "darwin",
   "architecture": "arm64",
   "channel": "friends-beta",
@@ -19,5 +18,6 @@
     "blockmapUrl": null,
     "fallbackUrl": null
   },
-  "minOSVersion": "macOS 12.0 Monterey+ (Apple Silicon)"
+  "minOSVersion": "macOS 12.0 Monterey+ (Apple Silicon)",
+  "productName": "Quantum IDE"
 }

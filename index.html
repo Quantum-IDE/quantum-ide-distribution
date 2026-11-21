@@ -144,7 +144,7 @@
     }
 
     // 8. Core schema attributes
-    if (m.product !== 'Quantum IDE' || m.platform !== 'windows' || m.architecture !== 'x64' || m.channel !== 'friends-beta') {
+    if (m.productName !== 'Quantum IDE' || m.platform !== 'windows' || m.architecture !== 'x64' || m.channel !== 'friends-beta') {
       return { valid: false, reason: 'Channel or target metadata mismatch' };
     }
 

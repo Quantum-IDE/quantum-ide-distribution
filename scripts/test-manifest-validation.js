@@ -27,12 +27,14 @@ const testCases = [
     name: '1. Valid manifest with available release (version: 0.1.0-beta.1) (positive test)',
     shouldPass: true,
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
       version: '0.1.0-beta.1',
+      buildRevision: 1,
+      commit: 'd84d7f152a925dc20c91f2422df5ef9655df1dde',
       updateClass: 'manual-consent',
       publishedAt: '2026-11-21T10:00:00Z',
       available: true,
@@ -53,8 +55,8 @@ const testCases = [
     name: '2. Valid manifest with available: false (intended null values) (positive test)',
     shouldPass: true,
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -80,8 +82,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'pattern',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -101,8 +103,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'type',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -115,8 +117,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'type',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -129,8 +131,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'required',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -143,8 +145,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'required',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -160,8 +162,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'pattern',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -181,8 +183,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'minimum',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -202,8 +204,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'enum',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -216,8 +218,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'pattern',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -237,8 +239,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'required',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 'x64',
       channel: 'friends-beta',
@@ -254,8 +256,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'required',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       channel: 'friends-beta',
       updateClass: 'manual-consent',
@@ -267,8 +269,8 @@ const testCases = [
     shouldPass: false,
     expectedErrorKeyword: 'type',
     data: {
-      schemaVersion: '1.0.0',
-      product: 'Quantum IDE',
+      schemaVersion: '2.0.0',
+      productName: 'Quantum IDE',
       platform: 'windows',
       architecture: 64,
       channel: 'friends-beta',
@@ -347,7 +349,7 @@ function verifyReleaseData(m) {
     return { valid: false, reason: 'updateClass is not supported' };
   }
 
-  if (m.product !== 'Quantum IDE' || m.platform !== 'windows' || m.architecture !== 'x64' || m.channel !== 'friends-beta') {
+  if (m.productName !== 'Quantum IDE' || m.platform !== 'windows' || m.architecture !== 'x64' || m.channel !== 'friends-beta') {
     return { valid: false, reason: 'Channel or target metadata mismatch' };
   }
 
@@ -366,7 +368,7 @@ const clientCases = [
     name: 'B. available=true with valid data & version=0.1.0-beta.1 => valid: true (State 2: Download enabled)',
     check: () => {
       const res = verifyReleaseData({
-        product: 'Quantum IDE',
+        productName: 'Quantum IDE',
         platform: 'windows',
         architecture: 'x64',
         channel: 'friends-beta',
@@ -406,7 +408,7 @@ const clientCases = [
     name: 'F. version=0.1.0junk with available=true => valid: false & isUnavailable: undefined (State 3: Invalid Manifest)',
     check: () => {
       const res = verifyReleaseData({
-        product: 'Quantum IDE',
+        productName: 'Quantum IDE',
         platform: 'windows',
         architecture: 'x64',
         channel: 'friends-beta',
