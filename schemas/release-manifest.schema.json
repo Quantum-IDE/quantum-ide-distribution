@@ -39,7 +39,7 @@
     },
     "channel": {
       "type": "string",
-      "enum": ["friends-beta", "canary", "stable"],
+      "enum": ["friends-beta", "friends-beta-validation", "canary", "stable"],
       "description": "Distribution channel name"
     },
     "installerType": {
