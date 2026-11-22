@@ -7,15 +7,15 @@
     "installerType": "inno-user-setup",
     "channel": "friends-beta",
     "version": "v0.1.0-beta.1",
-    "buildRevision": 11,
-    "commit": "cc64e20ddae5cba48fa3982e5ee6175e523f46f4",
+    "buildRevision": 12,
+    "commit": "b87b560a5c7aa875a311960af4da980a2d22916c",
     "updateClass": "silent-next-launch",
-    "publishedAt": "2026-11-22T18:54:00.000Z",
+    "publishedAt": "2026-11-22T19:48:00.000Z",
     "available": true,
-    "downloadUrl": "https://github.com/Quantum-IDE/quantum-ide-distribution/releases/download/v0.1.0-beta.1/Quantum-IDE-0.1.0-beta.1-rev11-win-x64-setup.exe",
-    "fileName": "Quantum-IDE-0.1.0-beta.1-rev11-win-x64-setup.exe",
-    "sizeBytes": 215504863,
-    "sha256": "67c530950b937c1dcdd3fbb82623c36d2fa8bde14d4e71e16a91da514f7d6dd7",
+    "downloadUrl": "https://github.com/Quantum-IDE/quantum-ide-distribution/releases/download/v0.1.0-beta.1/Quantum-IDE-0.1.0-beta.1-rev12-win-x64-setup.exe",
+    "fileName": "Quantum-IDE-0.1.0-beta.1-rev12-win-x64-setup.exe",
+    "sizeBytes": 215502361,
+    "sha256": "de554a2c01c474e431ea9e8678529d3e2e77eaad7cb3991a07914fcf4fad5ad1",
     "releaseNotesUrl": "https://github.com/Quantum-IDE/quantum-ide-distribution/releases/tag/v0.1.0-beta.1",
     "deltaSupport": {
         "enabled": false,
@@ -24,5 +24,5 @@
     },
     "minOSVersion": "Windows 10 Build 19041+ (64-bit)",
     "keyId": "quantum-update-v1-prod",
-    "signature": "h0jK7YLBTiEPxoNXc8EKJguiJu+B4t1l0Fml1EVcYWvCW6SotgBhaV9Ebh4jO5Ji2S65mDZzVR2sh2gKsYJmDg=="
+    "signature": "9XVWMidEbcq+NZ5CK1rwDMXYXF6/en+lKeyV69MYuf6Fl7P0j9nHUmxcgOFDef6jupu93V0aXct1g23lyQ7sBQ=="
 }
