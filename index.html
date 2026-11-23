@@ -576,3 +576,4 @@ if(RM)showUI();else document.body.classList.add('assembling');
 cv.addEventListener('click',e=>{if(shown&&!RM)shock(e.clientX,e.clientY)});
 build();new ResizeObserver(()=>{build();if(RM)tick(1/60)}).observe(cv);cv.onpointermove=e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top};cv.onpointerleave=()=>{mouse.x=mouse.y=-9999};last=performance.now();function frame(now){let dt=Math.min(.05,(now-last)/1000);last=now;if(dt>0&&W>1)tick(dt);if(!RM)requestAnimationFrame(frame)}requestAnimationFrame(frame);})();
 </script></body></html>
+<!-- rev13 deployed -->
